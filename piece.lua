@@ -40,6 +40,25 @@ Piece.set_position = function(self, x, y)
   self.y = y
 end
 
+Piece.allowed_at = function(self, grid, x, y)
+  -- check for bounds
+  local minx, maxx, miny, maxy = gu.matrix_bounds(self.grid.matrix)
+  if x + minx < 0 then
+    return false
+  end
+
+  if x + maxx > grid.width - 1 then
+    return false
+  end
+
+  if y + maxy > grid.height - 1 then
+    return false
+  end
+  
+  -- check for solids
+  return true
+end
+
 Piece.update = function(dt)
 end
 
@@ -50,7 +69,7 @@ function make_l_right(color)
   if color == Piece.GREEN then
     tile_kind = Tile.GREEN
   else
-    io.stderr:write('Unknown piece color')
+    io.stderr:write('Unknown piece color\n')
     love.event.quit(1)
   end
 

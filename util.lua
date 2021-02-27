@@ -1,4 +1,3 @@
-local palette = require 'palette'
 local util = {}
 
 function interp(s, tab)
@@ -33,14 +32,6 @@ util.str = function(maybe_str)
     return '(nil)'
   end
   return maybe_str
-end
-
-util.set_color = function(color, intensity)
-  if color == nil and intensity == nil then
-    love.graphics.setColor(1, 1, 1, 1)
-  else
-    love.graphics.setColor(unpack(palette[color][intensity]))
-  end
 end
 
 return util

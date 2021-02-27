@@ -1,4 +1,6 @@
+local gu = require 'gameutil'
 local util = require 'util'
+
 local Tile = require 'tile'
 
 local Renderer = {}
@@ -10,10 +12,11 @@ setmetatable(Renderer, {
   end,
 })
 
-Renderer.new = function(sprites)
+Renderer.new = function(tiles, sprites)
   local self = {}
   setmetatable(self, Renderer)
 
+  self.tiles = tiles
   self.sprites = sprites
 
   return self
@@ -33,7 +36,7 @@ Renderer._draw_matrix = function(self, matrix, ox, oy)
       if texture then
         local tx = (c - 1) * Tile.SIZE + ox
         local ty = (r - 1) * Tile.SIZE + oy
-        love.graphics.draw(self.sprites:get(texture).texture, tx, ty)
+        love.graphics.draw(self.tiles:get(texture).texture, tx, ty)
       end
     end
   end
@@ -45,10 +48,16 @@ Renderer.draw = function(self, game, dt)
 
   -- draw the grid
 
-  util.set_color()
+  gu.set_color()
   local ox = math.floor((self.width - game.grid.width * Tile.SIZE) / 2)
   local oy = math.floor((self.height - game.grid.height * Tile.SIZE) / 2)
   self:_draw_matrix(game.grid.matrix, ox, oy)
+
+  -- draw the protagonist
+  local ptexture = self.sprites:get(game.protagonist:texture_name()).texture
+  local px = game.protagonist.x * Tile.SIZE + game.protagonist.ox + ox - Tile.SIZE / 2
+  local py = game.protagonist.y * Tile.SIZE + game.protagonist.oy + oy - Tile.SIZE
+  love.graphics.draw(ptexture, px, py)
 
   -- draw the falling piece
   if game.falling_piece then

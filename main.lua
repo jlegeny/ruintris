@@ -1,6 +1,7 @@
 local Game = require 'game'
 local Catalog = require 'catalog'
 
+local Protagonist = require 'protagonist'
 local Piece = require 'piece'
 
 local Background = require 'background'
@@ -22,9 +23,12 @@ local RENDER_HEIGHT = WINDOW_HEIGHT / 2
 
 local background_sprites = Catalog(Catalog.backgrounds)
 local tile_sprites = Catalog(Catalog.tiles)
-local game = Game(grid01)
+local sprites = Catalog(Catalog.sprites)
+
+local protagonist = Protagonist()
+local game = Game(grid01, protagonist)
 local background = Background(background_sprites)
-local renderer = Renderer(tile_sprites)
+local renderer = Renderer(tile_sprites, sprites)
 local overlay = Overlay()
 
 -- LOVE ROUTINES
@@ -44,7 +48,9 @@ function love.load()
   overlay:resize(RENDER_WIDTH, RENDER_HEIGHT)
 
   local piece = Piece(Piece.L_RIGHT, Piece.GREEN)
-  game:add_falling_piece(piece)
+  -- game:add_falling_piece(piece)
+  game.protagonist:set_position(1, 22, 0, 0)
+  --game.protagonist:set_position(0, 0, 0, 0)
 end
 
 function love.keypressed(key, unicode)

@@ -1,3 +1,4 @@
+local gu = require 'gameutil'
 local util = require 'util'
 local Tile = require 'tile'
 
@@ -31,7 +32,7 @@ Overlay.draw = function(self, game, dt)
 
   love.graphics.setLineWidth(1)
   love.graphics.setLineStyle('rough')
-  util.set_color('grey', 0)
+  gu.set_color('grey', 0)
   local ox = math.floor((self.width - game.grid.width * Tile.SIZE) / 2)
   local oy = math.floor((self.height - game.grid.height * Tile.SIZE) / 2)
   for r = 0, game.grid.height - 1 do
@@ -41,7 +42,12 @@ Overlay.draw = function(self, game, dt)
       love.graphics.rectangle('line', tx, ty, Tile.SIZE, Tile.SIZE)
     end
   end
-  util.set_color()
+
+  gu.set_color('red', 0)
+  local px = game.protagonist.x * Tile.SIZE + 0.5 + ox
+  local py = game.protagonist.y * Tile.SIZE + 0.5 + oy
+  love.graphics.rectangle('line', px, py, Tile.SIZE, Tile.SIZE)
+  gu.set_color()
 
   love.graphics.setCanvas()
 

@@ -4,7 +4,10 @@ local Tile = require 'tile'
 local function make()
   local grid = gu.mk_grid(15, 24)
 
-  grid.matrix[10][10] = Tile(Tile.STONE)
+  for i = 1, 15 do
+    grid.matrix[i][24] = Tile(Tile.STONE)
+  end
+  grid.matrix[5][23] = Tile(Tile.STONE)
       
   return grid
 end
