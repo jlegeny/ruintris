@@ -26,14 +26,9 @@ Renderer.resize = function(self, width, height)
   self.canvas:setFilter('nearest', 'nearest')
 end
 
-Renderer.draw = function(self, game, dt)
-  love.graphics.setCanvas(self.canvas)
-
-  util.set_color()
-  local ox = math.floor((self.width - game.grid.width * Tile.SIZE) / 2)
-  local oy = math.floor((self.height - game.grid.height * Tile.SIZE) / 2)
-  for r, row in ipairs(game.grid) do
-    for c, tile in ipairs(row) do
+Renderer._draw_matrix = function(self, matrix, ox, oy)
+  for c, column in ipairs(matrix) do
+    for r, tile in ipairs(column) do
       local texture = tile:texture_name()
       if texture then
         local tx = (c - 1) * Tile.SIZE + ox
@@ -41,6 +36,25 @@ Renderer.draw = function(self, game, dt)
         love.graphics.draw(self.sprites:get(texture).texture, tx, ty)
       end
     end
+  end
+end
+
+Renderer.draw = function(self, game, dt)
+  love.graphics.setCanvas(self.canvas)
+  love.graphics.clear()
+
+  -- draw the grid
+
+  util.set_color()
+  local ox = math.floor((self.width - game.grid.width * Tile.SIZE) / 2)
+  local oy = math.floor((self.height - game.grid.height * Tile.SIZE) / 2)
+  self:_draw_matrix(game.grid.matrix, ox, oy)
+
+  -- draw the falling piece
+  if game.falling_piece then
+    local ox = math.floor((self.width - game.grid.width * Tile.SIZE) / 2) + game.falling_piece.x * Tile.SIZE
+    local oy = math.floor((self.height - game.grid.height * Tile.SIZE) / 2) + game.falling_piece.y * Tile.SIZE
+    self:_draw_matrix(game.falling_piece.grid.matrix, ox, oy)
   end
 
   love.graphics.setCanvas()

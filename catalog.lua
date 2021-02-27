@@ -8,7 +8,7 @@ setmetatable(Catalog, {
 })
 
 Catalog.backgrounds = { 'dusk', }
-Catalog.tiles = { 'tile-stone', }
+Catalog.tiles = { 'tile-stone', 'tile-green-0', 'tile-green-1', 'tile-green-2'}
 
 Catalog.new = function(image_names)
   local self = {}

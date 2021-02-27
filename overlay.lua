@@ -34,10 +34,10 @@ Overlay.draw = function(self, game, dt)
   util.set_color('grey', 0)
   local ox = math.floor((self.width - game.grid.width * Tile.SIZE) / 2)
   local oy = math.floor((self.height - game.grid.height * Tile.SIZE) / 2)
-  for r, row in ipairs(game.grid) do
-    for c, tile in ipairs(row) do
-      local tx = (c - 1) * Tile.SIZE + 0.5 + ox
-      local ty = (r - 1) * Tile.SIZE + 0.5 + oy
+  for r = 0, game.grid.height - 1 do
+    for c = 0, game.grid.width - 1 do
+      local tx = c * Tile.SIZE + 0.5 + ox
+      local ty = r * Tile.SIZE + 0.5 + oy
       love.graphics.rectangle('line', tx, ty, Tile.SIZE, Tile.SIZE)
     end
   end

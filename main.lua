@@ -1,6 +1,8 @@
 local Game = require 'game'
 local Catalog = require 'catalog'
 
+local Piece = require 'piece'
+
 local Background = require 'background'
 local Renderer = require 'renderer'
 local Overlay = require 'overlay'
@@ -40,16 +42,23 @@ function love.load()
   background:resize(RENDER_WIDTH, RENDER_HEIGHT)
   renderer:resize(RENDER_WIDTH, RENDER_HEIGHT)
   overlay:resize(RENDER_WIDTH, RENDER_HEIGHT)
+
+  local piece = Piece(Piece.L_RIGHT, Piece.GREEN)
+  game:add_falling_piece(piece)
 end
 
 function love.keypressed(key, unicode)
   if key == 'r' and debug then
     love.event.quit('restart')
   end
+
+  game:keypressed(key, unicode)
 end
 
 function love.draw()
   local dt = love.timer.getDelta()
+
+  game:update(dt)
 
   --background:draw(game, dt)
   renderer:draw(game, dt)
