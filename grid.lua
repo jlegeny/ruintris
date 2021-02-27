@@ -1,3 +1,5 @@
+local Tile = require 'tile'
+
 local Grid = {}
 Grid.__index = Grid
 
@@ -7,7 +9,7 @@ setmetatable(Grid, {
   end,
 })
 
-Grid.new = function(width, height, matrix)
+Grid.new = function(width, height, matrix, script)
   local self = {}
   setmetatable(self, Grid)
 
@@ -15,7 +17,14 @@ Grid.new = function(width, height, matrix)
   self.height = height
   self.matrix = matrix
 
+  self.script = script
+
   return self
+end
+
+Grid.passable = function(self, x, y)
+  local tile_at = self.matrix[x + 1][y + 1]
+  return tile_at.kind == Tile.EMPTY or tile_at.kind == Tile.CONTROL_PANEL
 end
 
 Grid.update = function(self, dt)

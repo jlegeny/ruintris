@@ -34,4 +34,17 @@ util.str = function(maybe_str)
   return maybe_str
 end
 
+util.log = function(template, ...)
+  if not util.debug then
+    return
+  end
+
+  local args = {...}
+  for i, v in ipairs(args) do
+    template = template:gsub('{}', util.str(v), 1)
+  end
+
+  print(template)
+end
+
 return util

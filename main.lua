@@ -1,3 +1,5 @@
+local util = require 'util'
+
 local Game = require 'game'
 local Catalog = require 'catalog'
 
@@ -12,7 +14,7 @@ local grid01 = require 'grids/grid01'
 
 -- CONSTANTS
 
-local debug = true
+util.debug = true
 
 local WINDOW_WIDTH = 960
 local WINDOW_HEIGHT = 720
@@ -29,7 +31,7 @@ local protagonist = Protagonist()
 local game = Game(grid01, protagonist)
 local background = Background(background_sprites)
 local renderer = Renderer(tile_sprites, sprites)
-local overlay = Overlay()
+local overlay = Overlay(sprites)
 
 -- LOVE ROUTINES
 
@@ -43,18 +45,22 @@ function love.load()
     minwidth = WINDOW_WIDTH, 
     minheight = WINDOW_HEIGHT
   })
+  local font = love.graphics.newImageFont('assets/font.png',
+  ' abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?-+/():;%&`_*#=[]\'{}', 1) 
+  love.graphics.setFont(font)
+
   background:resize(RENDER_WIDTH, RENDER_HEIGHT)
   renderer:resize(RENDER_WIDTH, RENDER_HEIGHT)
   overlay:resize(RENDER_WIDTH, RENDER_HEIGHT)
 
   local piece = Piece(Piece.L_RIGHT, Piece.GREEN)
   -- game:add_falling_piece(piece)
-  game.protagonist:set_position(1, 22, 0, 0)
+  game.protagonist:set_position(10, 22, 0, 0)
   --game.protagonist:set_position(0, 0, 0, 0)
 end
 
 function love.keypressed(key, unicode)
-  if key == 'r' and debug then
+  if key == 'r' and util.debug then
     love.event.quit('restart')
   end
 
@@ -66,7 +72,8 @@ function love.draw()
 
   game:update(dt)
 
-  --background:draw(game, dt)
+  background:draw(game, dt)
   renderer:draw(game, dt)
   overlay:draw(game, dt)
+  --
 end

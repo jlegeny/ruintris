@@ -50,7 +50,7 @@ Renderer.draw = function(self, game, dt)
 
   gu.set_color()
   local ox = math.floor((self.width - game.grid.width * Tile.SIZE) / 2)
-  local oy = math.floor((self.height - game.grid.height * Tile.SIZE) / 2)
+  local oy = math.floor((self.height - game.grid.height * Tile.SIZE) - 58)
   self:_draw_matrix(game.grid.matrix, ox, oy)
 
   -- draw the protagonist
@@ -61,9 +61,9 @@ Renderer.draw = function(self, game, dt)
 
   -- draw the falling piece
   if game.falling_piece then
-    local ox = math.floor((self.width - game.grid.width * Tile.SIZE) / 2) + game.falling_piece.x * Tile.SIZE
-    local oy = math.floor((self.height - game.grid.height * Tile.SIZE) / 2) + game.falling_piece.y * Tile.SIZE
-    self:_draw_matrix(game.falling_piece.grid.matrix, ox, oy)
+    local pox = ox + game.falling_piece.x * Tile.SIZE
+    local poy = oy + game.falling_piece.y * Tile.SIZE
+    self:_draw_matrix(game.falling_piece.grid.matrix, pox, poy)
   end
 
   love.graphics.setCanvas()

@@ -11,6 +11,10 @@ setmetatable(Protagonist, {
 
 Protagonist.IDLE = 'idle'
 Protagonist.WALK = 'walk'
+Protagonist.HOIST = 'hoist'
+Protagonist.START_FALL = 'start-fall'
+Protagonist.FALL = 'fall'
+Protagonist.LAND = 'land'
 
 Protagonist.LEFT = 'l'
 Protagonist.RIGHT = 'r'
@@ -46,7 +50,28 @@ Protagonist.set_animation = function(self, kind)
       frame_duration = 0.16,
       t = 0,
     }
-  end
+  elseif kind == Protagonist.HOIST then
+    self.animation = {
+      frame = 0,
+      frames = 4,
+      frame_duration = 0.16,
+      t = 0,
+    }
+  elseif kind == Protagonist.START_FALL then
+    self.animation = {
+      frame = 0,
+      frames = 3,
+      frame_duration = 0.16,
+      t = 0,
+     }
+  elseif kind == Protagonist.FALL then
+    self.animation = {
+      frame = 0,
+      frames = 2,
+      frame_duration = 0.16,
+      t = 0,
+     }
+   end
 end
 
 Protagonist.set_position = function(self, x, y, ox, oy)
@@ -54,6 +79,10 @@ Protagonist.set_position = function(self, x, y, ox, oy)
   self.y = y
   self.ox = ox
   self.oy = oy
+end
+
+Protagonist.has_control = function(self)
+  return self.state == Protagonist.IDLE or self.state == Protagonist.WALK
 end
 
 Protagonist.texture_name = function(self)
@@ -65,15 +94,13 @@ Protagonist.texture_name = function(self)
   if self.state == Protagonist.IDLE then
     return 'protagonist-idle-${d}' % {d = self.direction}
   elseif self.state == Protagonist.WALK then
-    if self.animation.frame == 0 then
-      return 'protagonist-step-${d}-0' % {d = self.direction}
-    elseif self.animation.frame == 1 then
-      return 'protagonist-step-${d}-1' % {d = self.direction}
-    elseif self.animation.frame == 2 then
-      return 'protagonist-step-${d}-2' % {d = self.direction}
-    elseif self.animation.frame == 3 then
-      return 'protagonist-step-${d}-3' % {d = self.direction}
-    end
+    return 'protagonist-step-${d}-${f}' % {d = self.direction, f = self.animation.frame}
+  elseif self.state == Protagonist.HOIST then
+    return 'protagonist-hoist-${d}-${f}' % {d = self.direction, f = self.animation.frame}
+  elseif self.state == Protagonist.START_FALL then
+    return 'protagonist-idle-${d}' % {d = self.direction}
+  elseif self.state == Protagonist.FALL then
+    return 'protagonist-idle-${d}' % {d = self.direction}
   end
   return nil
 end
@@ -83,12 +110,7 @@ Protagonist.allowed_at = function(self, grid, x, y)
     return false
   end
 
-  if grid.matrix[x + 1][y + 1].kind ~= Tile.EMPTY then
-    return false
-  end
-  print(x, y, grid.matrix[x + 1][y + 1].kind)
-
-  return true
+  return grid:passable(x, y)
 end
 
 Protagonist.update = function(self, dt)
@@ -98,9 +120,39 @@ Protagonist.update = function(self, dt)
 
   self.animation.t = self.animation.t + dt
   if self.animation.t >= self.animation.frame_duration then
+    if self.state == Protagonist.HOIST and self.animation.frame == self.animation.frames - 1 then
+      self.state = Protagonist.IDLE
+      self:set_animation(Protagonist.IDLE)
+      if self.direction == Protagonist.RIGHT then
+        self.x = self.x + 1
+        self.y = self.y - 1
+        self.ox = 0
+      elseif self.direction == Protagonist.LEFT then
+        self.x = self.x - 1
+        self.y = self.y - 1
+        self.ox = 0
+      end
+    elseif self.state == Protagonist.START_FALL then
+      local pd = 1
+      if self.direction == Protagonist.LEFT then
+        pd = -1
+      end
+      if self.animation.frame == 0 then
+        self.ox = self.ox + 2 * pd
+        self.oy = self.oy + 1
+      elseif self.animation.frame == 1 then
+        self.ox = self.ox + 2 * pd
+        self.oy = self.oy + 2
+      elseif self.animation.frame == 2 then
+        self.oy = self.oy + 2
+        self.state = Protagonist.FALL
+        self:set_animation(Protagonist.FALL)
+      end
+    end
     self.animation.frame = (self.animation.frame + 1) % self.animation.frames
     self.animation.t = self.animation.t - self.animation.frame_duration
   end
+
 end
 
 return Protagonist

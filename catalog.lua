@@ -10,19 +10,43 @@ setmetatable(Catalog, {
 })
 
 Catalog.backgrounds = { 'dusk', }
-Catalog.tiles = { 'tile-stone', 'tile-green-0', 'tile-green-1', 'tile-green-2'}
+Catalog.tiles = {
+  'tile-stone',
+  'tile-green-0',
+  'tile-green-1',
+  'tile-green-2',
+  'tile-control-panel',
+  'tile-conveyor-left-0',
+  'tile-conveyor-mid-0',
+  'tile-conveyor-right-0',
+  'tile-conveyor-left-1',
+  'tile-conveyor-mid-1',
+  'tile-conveyor-right-1',
+  'tile-conveyor-left-2',
+  'tile-conveyor-mid-2',
+  'tile-conveyor-right-2',
+}
 Catalog.sprites = {
   'protagonist-idle-r',
   'protagonist-step-r-0',
   'protagonist-step-r-1',
   'protagonist-step-r-2',
   'protagonist-step-r-3',
+  'protagonist-hoist-r-0',
+  'protagonist-hoist-r-1',
+  'protagonist-hoist-r-2',
+  'protagonist-hoist-r-3',
   'protagonist-idle-l',
   'protagonist-step-l-0',
   'protagonist-step-l-1',
   'protagonist-step-l-2',
   'protagonist-step-l-3',
-}
+  'protagonist-hoist-l-0',
+  'protagonist-hoist-l-1',
+  'protagonist-hoist-l-2',
+  'protagonist-hoist-l-3',
+  'scroll',
+ }
 
 Catalog.new = function(image_names)
   local self = {}

@@ -54,6 +54,20 @@ Piece.allowed_at = function(self, grid, x, y)
   if y + maxy > grid.height - 1 then
     return false
   end
+
+  for c, column in ipairs(self.grid.matrix) do
+    if x + c >= 1 and x + c <= grid.width then
+      for r, tile in ipairs(column) do
+        if y + r >= 1 and y + r <= grid.height then
+          if tile.kind ~= Tile.EMPTY then
+            if grid.matrix[x + c][y + r].kind ~= Tile.EMPTY then
+              return false
+            end
+          end
+        end
+      end
+    end
+  end
   
   -- check for solids
   return true
@@ -67,7 +81,7 @@ function make_l_right(color)
 
   local tile_kind
   if color == Piece.GREEN then
-    tile_kind = Tile.GREEN
+    tile_kind = Tile.GREEN_FALLING
   else
     io.stderr:write('Unknown piece color\n')
     love.event.quit(1)

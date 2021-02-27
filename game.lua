@@ -15,6 +15,7 @@ setmetatable(Game, {
 
 Game.CTRL_PROTAGONIST = 'ctrl-protagonist'
 Game.CTRL_FALLING_PIECE = 'ctrl-falling-piece'
+Game.CTRL_NONE = 'ctrl-none'
 
 Game.new = function(grid, protagonist)
   local self = {}
@@ -28,6 +29,8 @@ Game.new = function(grid, protagonist)
   self.input_gating = 0
   self.next_move = nil
   self.t = 0
+
+  self.text = ''
 
   return self
 end
@@ -48,7 +51,7 @@ Game.tick = function(self)
       for c, column in ipairs(self.falling_piece.grid.matrix) do
         for r, tile in ipairs(column) do
           if not (tile.kind == Tile.EMPTY) then
-            self.grid.matrix[self.falling_piece.x + c][self.falling_piece.y + r] = Tile(tile.kind)
+            self.grid.matrix[self.falling_piece.x + c][self.falling_piece.y + r] = Tile(tile:transforms_to())
           end
         end
       end
@@ -57,9 +60,70 @@ Game.tick = function(self)
   end
 end
 
+Game.update_protagonist = function(self, p)
+  if p.state == Protagonist.WALK then
+    if p.direction == Protagonist.RIGHT then
+      p.ox = p.ox + 1
+      if p.ox >= Tile.SIZE / 2 then
+        if p:allowed_at(self.grid, p.x + 1, p.y) then
+          p.x = p.x + 1
+          p.ox = p.ox - Tile.SIZE
+          if p:allowed_at(self.grid, p.x, p.y + 1) then
+            p.state = Protagonist.START_FALL
+            p.set_animation(Protagonist.START_FALL)
+          end
+        else
+          if p:allowed_at(self.grid, p.x + 1, p.y - 1) then
+            p.state = Protagonist.HOIST
+            p.set_animation(Protagonist.HOIST)
+          else
+            p.state = Protagonist.IDLE
+            p.set_animation(Protagonist.IDLE)
+          end
+          p.ox = Tile.SIZE / 2 - 1
+        end
+      end
+    elseif p.direction == Protagonist.LEFT then
+      p.ox = p.ox - 1
+      if p.ox <=  -Tile.SIZE / 2 then
+        if p:allowed_at(self.grid, p.x - 1, p.y) then
+          p.x = p.x - 1
+          p.ox = p.ox + Tile.SIZE
+          if p:allowed_at(self.grid, p.x, p.y + 1) then
+            p.state = Protagonist.START_FALL
+            p.set_animation(Protagonist.START_FALL)
+          end
+        else
+          if p:allowed_at(self.grid, p.x + 1, p.y - 1) then
+            p.state = Protagonist.HOIST
+            p.set_animation(Protagonist.HOIST)
+          else
+            p.state = Protagonist.IDLE
+            p.set_animation(Protagonist.IDLE)
+          end
+          p.ox = -Tile.SIZE / 2 + 1
+        end
+      end
+    end
+  elseif p.state == Protagonist.FALL then
+    p.oy = p.oy + 1
+    if p.oy >= 0 then
+      if p:allowed_at(self.grid, p.x, p.y + 1) then
+        p.y = p.y + 1
+        p.oy = p.oy - Tile.SIZE
+      else
+        p.state = Protagonist.IDLE
+      end
+    end
+  end
+end
+
 Game.update = function(self, dt)
   self.input_gating = self.input_gating - dt
   -- controls
+  if not self.protagonist:has_control() then
+    goto skip_input
+  end
   if self.state == Game.CTRL_PROTAGONIST then
     if love.keyboard.isScancodeDown('right') then
       if self.protagonist.state ~= Protagonist.WALK then
@@ -113,38 +177,21 @@ Game.update = function(self, dt)
     end
   end
 
+  ::skip_input::
+
+  local pastx, pasty = self.protagonist.x, self.protagonist.y
+
   self.grid:update(dt)
   self.protagonist:update(dt)
   if self.falling_piece then
     self.falling_piece.grid:update(dt)
   end
 
-  if self.protagonist.state == Protagonist.WALK then
-    if self.protagonist.direction == Protagonist.RIGHT then
-      self.protagonist.ox = self.protagonist.ox + 1
-      if self.protagonist.ox >= Tile.SIZE / 2 then
-        if self.protagonist:allowed_at(self.grid, self.protagonist.x + 1, self.protagonist.y) then
-          self.protagonist.x = self.protagonist.x + 1
-          self.protagonist.ox = self.protagonist.ox - Tile.SIZE
-        else
-          self.protagonist.state = Protagonist.IDLE
-          self.protagonist.set_animation(Protagonist.IDLE)
-          self.protagonist.ox = Tile.SIZE / 2 - 1
-        end
-      end
-    elseif self.protagonist.direction == Protagonist.LEFT then
-      self.protagonist.ox = self.protagonist.ox - 1
-      if self.protagonist.ox <=  -Tile.SIZE / 2 then
-        if self.protagonist:allowed_at(self.grid, self.protagonist.x - 1, self.protagonist.y) then
-          self.protagonist.x = self.protagonist.x - 1
-          self.protagonist.ox = self.protagonist.ox + Tile.SIZE
-        else
-          self.protagonist.state = Protagonist.IDLE
-          self.protagonist.set_animation(Protagonist.IDLE)
-          self.protagonist.ox = -Tile.SIZE / 2 + 1
-        end
-      end
-     end
+  self:update_protagonist(self.protagonist)
+
+  if pastx ~= self.protagonist.x or pasty ~= self.protagonist.y then
+    print(self.grid.script.trigger)
+    self.grid.script.entered(self.protagonist.x, self.protagonist.y, pastx, pasty, self)
   end
 
   self.t = self.t + dt
@@ -155,6 +202,13 @@ Game.update = function(self, dt)
 end
 
 Game.keypressed = function(self, key, unicode)
+  key = love.keyboard.getScancodeFromKey(key)
+
+  if self.protagonist.state == Protagonist.IDLE then
+    if key == 'space' then
+      self.grid.script.trigger(self.protagonist.x, self.protagonist.y, self)
+    end
+  end
 end
 
 return Game
