@@ -72,7 +72,7 @@ function love.draw()
 
   game:update(dt)
 
-  background:draw(game, dt)
+  --background:draw(game, dt)
   renderer:draw(game, dt)
   overlay:draw(game, dt)
   --

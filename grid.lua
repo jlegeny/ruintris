@@ -1,3 +1,4 @@
+local util = require 'util'
 local Tile = require 'tile'
 
 local Grid = {}
@@ -24,6 +25,7 @@ end
 
 Grid.passable = function(self, x, y)
   local tile_at = self.matrix[x + 1][y + 1]
+  util.log('Tile at {}, {} is {}', x + 1, y + 1, tile_at.kind)
   return tile_at.kind == Tile.EMPTY or tile_at.kind == Tile.CONTROL_PANEL
 end
 

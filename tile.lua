@@ -20,6 +20,9 @@ Tile.CONVEYOR_RIGHT = 'conveyor-right'
 Tile.CONVEYOR_LEFT_CW = 'conveyor-left-cw'
 Tile.CONVEYOR_MID_CW = 'conveyor-mid-cw'
 Tile.CONVEYOR_RIGHT_CW = 'conveyor-right-cw'
+Tile.CONVEYOR_LEFT_CCW = 'conveyor-left-ccw'
+Tile.CONVEYOR_MID_CCW = 'conveyor-mid-ccw'
+Tile.CONVEYOR_RIGHT_CCW = 'conveyor-right-ccw'
 
 
 Tile.new = function(kind)
@@ -34,7 +37,14 @@ Tile.new = function(kind)
   if kind == Tile.GREEN_FALLING then
     self.frames = 4
     self.frame_duration = 0.25
-  elseif kind == Tile.CONVEYOR_LEFT_CW or kind == Tile.CONVEYOR_MID_CW or kind == Tile.CONVEYOR_RIGHT_CW then
+  elseif 
+    kind == Tile.CONVEYOR_LEFT_CW or
+    kind == Tile.CONVEYOR_MID_CW or 
+    kind == Tile.CONVEYOR_RIGHT_CW or
+    kind == Tile.CONVEYOR_LEFT_CCW or
+    kind == Tile.CONVEYOR_MID_CCW or 
+    kind == Tile.CONVEYOR_RIGHT_CCW 
+    then
     self.frames = 3
     self.frame_duration = 0.16
   end
@@ -65,6 +75,18 @@ Tile.texture_name = function(self)
     return 'tile-conveyor-mid-0'
   elseif self.kind == Tile.CONVEYOR_RIGHT then
     return 'tile-conveyor-right-0'
+  elseif self.kind == Tile.CONVEYOR_LEFT_CW then
+    return 'tile-conveyor-left-${f}' % { f = self.frame }
+  elseif self.kind == Tile.CONVEYOR_LEFT_CCW then
+    return 'tile-conveyor-left-${f}' % { f = 2 - self.frame }
+  elseif self.kind == Tile.CONVEYOR_MID_CW then
+    return 'tile-conveyor-mid-${f}' % { f = self.frame }
+  elseif self.kind == Tile.CONVEYOR_MID_CCW then
+    return 'tile-conveyor-mid-${f}' % { f = 2 - self.frame }
+   elseif self.kind == Tile.CONVEYOR_RIGHT_CW then
+    return 'tile-conveyor-right-${f}' % { f = self.frame }
+  elseif self.kind == Tile.CONVEYOR_RIGHT_CCW then
+    return 'tile-conveyor-right-${f}' % { f = 2 - self.frame }
   elseif self.kind == Tile.CONTROL_PANEL then
     return 'tile-control-panel'
   end

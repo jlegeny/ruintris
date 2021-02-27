@@ -40,6 +40,7 @@ end
 
 Overlay.draw = function(self, game, dt)
   love.graphics.setCanvas(self.canvas)
+  love.graphics.clear()
 
   love.graphics.setLineWidth(1)
   love.graphics.setLineStyle('rough')

@@ -15,6 +15,9 @@ Piece.L_RIGHT = 'l-right'
 
 Piece.GREEN = 'green'
 
+Piece.CW = 'cw'
+Piece.CCW = 'ccw'
+
 Piece.new = function(shape, color)
   local self = {}
   setmetatable(self, Piece)
@@ -23,6 +26,8 @@ Piece.new = function(shape, color)
   self.color = color
   self.x = 0
   self.y = 0
+  self.ox = 0
+  self.oy = 0
 
   self.grid = nil
   if self.shape == Piece.L_RIGHT then
@@ -71,6 +76,9 @@ Piece.allowed_at = function(self, grid, x, y)
   
   -- check for solids
   return true
+end
+
+Piece.rotate = function(self, direction)
 end
 
 Piece.update = function(dt)

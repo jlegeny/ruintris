@@ -12,6 +12,9 @@ local function entered(x, y, fromx, fromy, game)
   if r == 10 and c == 23 then
     game.text = 'Press [space] to interact with the wheel. Press [space] again to go back to exploring.'
   end
+  if fr == 10 and fc == 23 then
+    game.text = ''
+  end
 end
 
 local function trigger(x, y, game)
@@ -19,17 +22,61 @@ local function trigger(x, y, game)
   local tile_at = game.grid.matrix[x + 1][y + 1]
   -- CONTROL_PANELS
   if tile_at.kind == Tile.CONTROL_PANEL then
-    local piece = Piece(Piece.L_RIGHT, Piece.GREEN)
-    game:add_falling_piece(piece)
-    game.state = Game.CTRL_FALLING_PIECE
+    if game.state == Game.CTRL_PROTAGONIST then
+      game.state = Game.CTRL_CONVEYOR
+      game.text = 'Use arrows to move conveyor belt [left] or [right] to choose the piece. Press [space] to go back to exploring.'
+    elseif game.state == Game.CTRL_CONVEYOR then
+      game.state = Game.CTRL_PROTAGONIST
+      game.text = 'Press [space] to interact with the wheel. Press [space] again to go back to exploring.'
+      game.grid.script.conveyor(Game.STOP, game)
+    end
+    --local piece = Piece(Piece.L_RIGHT, Piece.GREEN)
+    --piece:set_position(6, 0) 
+    --game:add_falling_piece(piece)
   end
-  
 end
 
 local function covered(x, y, game)
 end
 
 local function uncovered(x, y, game)
+end
+
+local function set_conveyor(matrix, direction)
+  local cl = Tile.CONVEYOR_LEFT
+  local cm = Tile.CONVEYOR_MID
+  local cr = Tile.CONVEYOR_RIGHT
+  if direction == Game.RIGHT then
+    cl = Tile.CONVEYOR_LEFT_CW
+    cm = Tile.CONVEYOR_MID_CW
+    cr = Tile.CONVEYOR_RIGHT_CW
+  elseif direction == Game.LEFT then
+    cl = Tile.CONVEYOR_LEFT_CCW
+    cm = Tile.CONVEYOR_MID_CCW
+    cr = Tile.CONVEYOR_RIGHT_CCW
+  end
+  matrix[1][3] = Tile(cl)
+  matrix[2][3] = Tile(cm)
+  matrix[3][3] = Tile(cm)
+  matrix[4][3] = Tile(cm)
+  matrix[5][3] = Tile(cr)
+
+  matrix[11][3] = Tile(cl)
+  matrix[12][3] = Tile(cm)
+  matrix[13][3] = Tile(cm)
+  matrix[14][3] = Tile(cm)
+  matrix[15][3] = Tile(cr)
+end
+
+local function conveyor(direction, game)
+  util.log('Conveyor turining {}', direction)
+  if direction == Game.LEFT then
+    set_conveyor(game.grid.matrix, Game.LEFT)
+  elseif direction == Game.RIGHT then
+    set_conveyor(game.grid.matrix, Game.RIGHT)
+  elseif direction == Game.STOP then
+    set_conveyor(game.grid.matrix, Game.STOP)
+  end
 end
 
 local function make()
@@ -48,10 +95,14 @@ local function make()
 
   grid.matrix[10][23] = Tile(Tile.CONTROL_PANEL)
 
+  set_conveyor(grid.matrix, Game.STOP)
+
+
   grid.script = {
     entered = entered,
     trigger = trigger,
     covered = covered,
+    conveyor = conveyor,
     uncovered = uncovered,
   }
       
