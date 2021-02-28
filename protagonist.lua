@@ -15,6 +15,7 @@ Protagonist.HOIST = 'hoist'
 Protagonist.START_FALL = 'start-fall'
 Protagonist.FALL = 'fall'
 Protagonist.LAND = 'land'
+Protagonist.SQUISHED = 'squished'
 
 Protagonist.LEFT = 'l'
 Protagonist.RIGHT = 'r'
@@ -70,8 +71,8 @@ Protagonist.set_animation = function(self, kind)
       frames = 2,
       frame_duration = 0.16,
       t = 0,
-     }
-   end
+    }
+  end
 end
 
 Protagonist.set_position = function(self, x, y, ox, oy)
@@ -83,6 +84,12 @@ end
 
 Protagonist.has_control = function(self)
   return self.state == Protagonist.IDLE or self.state == Protagonist.WALK
+end
+
+Protagonist.set_squish = function(self, is_squished)
+  if is_squished then
+    self.state = Protagonist.SQUISHED
+  end
 end
 
 Protagonist.texture_name = function(self)
@@ -101,6 +108,8 @@ Protagonist.texture_name = function(self)
     return 'protagonist-idle-${d}' % {d = self.direction}
   elseif self.state == Protagonist.FALL then
     return 'protagonist-idle-${d}' % {d = self.direction}
+  elseif self.state == Protagonist.SQUISHED then
+    return 'protagonist-squished'
   end
   return nil
 end

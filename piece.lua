@@ -17,6 +17,7 @@ Piece.L_RIGHT = 'l-right'
 Piece.L_LEFT = 'l-left'
 Piece.S_RIGHT = 's-right'
 Piece.S_LEFT = 's-left'
+Piece.T = 't'
 
 Piece.GREEN = 'green'
 
@@ -101,6 +102,21 @@ Piece.allowed_at = function(self, grid, x, y)
   return true
 end
 
+Piece.squishes = function(self, x, y)
+  print('t', x, y)
+  for c, column in ipairs(self.grid.matrix) do
+    for r, tile in ipairs(column) do
+      if tile.kind ~= Tile.EMPTY then
+        if x == self.x + c and y == self.y + r then
+          return true
+        end
+      end
+    end
+  end
+  
+  return false
+end
+
 Piece.embed = function(self, matrix)
   for c, column in ipairs(self.grid.matrix) do
     for r, tile in ipairs(column) do
@@ -139,10 +155,11 @@ local _shapes = {
   [2] = Piece.L_LEFT,
   [3] = Piece.S_RIGHT,
   [4] = Piece.S_LEFT,
+  [5] = Piece.T,
 }
 
 Piece.random_shape = function()
-  return _shapes[math.random(1, 4)]
+  return _shapes[math.random(1, 5)]
 end
 
 function make(shape, color)
@@ -157,25 +174,30 @@ function make(shape, color)
   end
 
   if shape == Piece.L_RIGHT then
-    grid.matrix[2][1] = Tile(tile_kind)
+    grid.matrix[3][1] = Tile(tile_kind)
+    grid.matrix[1][2] = Tile(tile_kind)
     grid.matrix[2][2] = Tile(tile_kind)
-    grid.matrix[2][3] = Tile(tile_kind)
-    grid.matrix[3][3] = Tile(tile_kind)
+    grid.matrix[3][2] = Tile(tile_kind)
   elseif shape == Piece.L_LEFT then
-    grid.matrix[2][1] = Tile(tile_kind)
-    grid.matrix[2][2] = Tile(tile_kind)
-    grid.matrix[2][3] = Tile(tile_kind)
-    grid.matrix[1][3] = Tile(tile_kind)
-  elseif shape == Piece.S_RIGHT then
     grid.matrix[1][1] = Tile(tile_kind)
     grid.matrix[1][2] = Tile(tile_kind)
     grid.matrix[2][2] = Tile(tile_kind)
-    grid.matrix[2][3] = Tile(tile_kind)
+    grid.matrix[3][2] = Tile(tile_kind)
+  elseif shape == Piece.S_RIGHT then
+    grid.matrix[1][2] = Tile(tile_kind)
+    grid.matrix[2][2] = Tile(tile_kind)
+    grid.matrix[2][1] = Tile(tile_kind)
+    grid.matrix[3][1] = Tile(tile_kind)
   elseif shape == Piece.S_LEFT then
+    grid.matrix[1][1] = Tile(tile_kind)
+    grid.matrix[2][1] = Tile(tile_kind)
+    grid.matrix[2][2] = Tile(tile_kind)
+    grid.matrix[3][2] = Tile(tile_kind)
+  elseif shape == Piece.T then
     grid.matrix[2][1] = Tile(tile_kind)
     grid.matrix[1][2] = Tile(tile_kind)
     grid.matrix[2][2] = Tile(tile_kind)
-    grid.matrix[1][3] = Tile(tile_kind)
+    grid.matrix[3][2] = Tile(tile_kind)
   else
     io.stderr:write('Unknown piece shape ', util.str(shape), '\n')
     love.event.quit(1)

@@ -17,6 +17,33 @@ local state = {
   conveyor_t = 0,
 }
 
+local level_str = {
+  '               ',
+  '               ',
+  'C===D     C===D',
+  '               ',
+  '               ',
+  '               ',
+  '               ',
+  '               ',
+  '               ',
+  '               ',
+  '               ',
+  '               ',
+  '               ',
+  '         ## ###',
+  '              #',
+  '              #',
+  '              #',
+  'v             #',
+  '##            #',
+  '##            #',
+  '##            #',
+  '##           ##',
+  '###  ### v  ###',
+  '###############',
+}
+
 local function set_conveyor(matrix, direction)
   state.conveyor = direction
   local cl = Tile.CONVEYOR_LEFT
@@ -48,14 +75,17 @@ local function generate_pieces(game)
   if state.piece_left or state.piece_right then
     return
   end
-  left = Piece(Piece.random_shape(), Piece.GREEN)
-  left:rotate(Piece.CW)
+  local left_shape = Piece.random_shape()
+  left = Piece(left_shape, Piece.GREEN)
   left.embeddable = false
   local minx, maxx, miny, maxy = gu.matrix_bounds(left.grid.matrix)
   left:set_position(1, 2 - maxy - 1)
 
-  right = Piece(Piece.random_shape(), Piece.GREEN)
-  right:rotate(Piece.CW)
+  local right_shape = Piece.random_shape()
+  while right_shape == left_shape do
+    right_shape = Piece.random_shape()
+  end
+  right = Piece(right_shape, Piece.GREEN)
   right.embeddable = false
   local minx, maxx, miny, maxy = gu.matrix_bounds(left.grid.matrix)
   right:set_position(11, 2 - maxy - 1)
@@ -67,29 +97,23 @@ local function generate_pieces(game)
 end
 
 
+local _char_to_tile = {
+  [' '] = Tile.EMPTY,
+  ['#'] = Tile.STONE,
+  ['v'] = Tile.CONTROL_PANEL,
+}
+
 local function make_grid()
   local grid = gu.mk_grid(15, 24)
 
-  for c = 1, 15 do
-    grid.matrix[c][24] = Tile(Tile.STONE)
+  for r, row in ipairs(level_str) do
+    for c = 1, #row do
+      local t = row:sub(c, c)
+      grid.matrix[c][r] = Tile(_char_to_tile[t])
+    end
   end
-  grid.matrix[3][23] = Tile(Tile.STONE)
-  grid.matrix[2][22] = Tile(Tile.STONE)
-  grid.matrix[2][23] = Tile(Tile.STONE)
-
-  grid.matrix[14][22] = Tile(Tile.STONE)
-  grid.matrix[14][23] = Tile(Tile.STONE)
-  grid.matrix[13][23] = Tile(Tile.STONE)
-
-  grid.matrix[6][23] = Tile(Tile.STONE)
-  grid.matrix[7][23] = Tile(Tile.STONE)
-  grid.matrix[8][23] = Tile(Tile.STONE)
-
-
-  grid.matrix[10][23] = Tile(Tile.CONTROL_PANEL)
 
   set_conveyor(grid.matrix, Game.STOP)
-
   return grid
 end
 
@@ -100,6 +124,11 @@ local function make_zones()
       { 6, 22 },
       { 7, 22 },
       { 8, 22 },
+    }),
+    Zone(Tile.ZONE_PINK, {
+      { 7, 13 },
+      { 8, 13 },
+      { 9, 13 },
     })
   }
 

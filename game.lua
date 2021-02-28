@@ -20,6 +20,7 @@ Game.CTRL_PROTAGONIST = 'ctrl-protagonist'
 Game.CTRL_CONVEYOR = 'ctrl-conveyor'
 Game.CTRL_FALLING_PIECE = 'ctrl-falling-piece'
 Game.CTRL_NONE = 'ctrl-none'
+Game.GAME_OVER = 'game-over'
 
 Game.LEFT = 'left'
 Game.RIGHT = 'right'
@@ -72,6 +73,7 @@ Game.tick = function(self)
   if self.falling_piece then
     if self.falling_piece:allowed_at(self.grid, self.falling_piece.x, self.falling_piece.y + 1) then
       self.falling_piece.y = self.falling_piece.y + 1
+      self.protagonist:set_squish(self.falling_piece:squishes(self.protagonist.x + 1, self.protagonist.y + 1))
     else
       self.falling_piece:embed(self.grid.matrix)
       self.falling_piece = nil
@@ -81,6 +83,7 @@ Game.tick = function(self)
   for _, piece in ipairs(self.pieces) do
     if piece:allowed_at(self.grid, piece.x, piece.y + 1) then
       piece.y = piece.y + 1
+      self.protagonist:set_squish(piece:squishes(self.protagonist.x + 1, self.protagonist.y + 1))
     elseif piece.embeddable then
       piece:embed(self.grid.matrix)
       piece.remove = true
@@ -364,6 +367,11 @@ Game.update = function(self, dt)
     self.t = self.t - TICK_DURATION
     self:tick()
   end
+
+  if self.protagonist.state == Protagonist.SQUISHED then
+    self.state = Game.GAME_OVER
+  end
+
 end
 
 Game.keypressed = function(self, key, unicode)

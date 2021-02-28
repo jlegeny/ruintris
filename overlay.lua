@@ -1,5 +1,6 @@
 local gu = require 'gameutil'
 local util = require 'util'
+local Game = require 'game'
 local Tile = require 'tile'
 
 local Overlay = {}
@@ -42,34 +43,44 @@ Overlay.draw = function(self, game, dt)
   love.graphics.setCanvas(self.canvas)
   love.graphics.clear()
 
-  love.graphics.setLineWidth(1)
-  love.graphics.setLineStyle('rough')
-  gu.set_color('grey', 0)
-  local ox = math.floor((self.width - game.grid.width * Tile.SIZE) / 2)
-  local oy = math.floor((self.height - game.grid.height * Tile.SIZE - 58))
-  for r = 0, game.grid.height - 1 do
-    for c = 0, game.grid.width - 1 do
-      local tx = c * Tile.SIZE + 0.5 + ox
-      local ty = r * Tile.SIZE + 0.5 + oy
-      love.graphics.rectangle('line', tx, ty, Tile.SIZE, Tile.SIZE)
-    end
+  if game.state == Game.GAME_OVER then
+    gu.set_color()
+    love.graphics.draw(self.sprites:get('scroll').texture, 0, 120)
+    love.graphics.printf('GAME OVER', 0, 155, 480, 'center')
   end
 
-  gu.set_color('red', 0)
-  local px = game.protagonist.x * Tile.SIZE + 0.5 + ox
-  local py = game.protagonist.y * Tile.SIZE + 0.5 + oy
-  love.graphics.rectangle('line', px, py, Tile.SIZE, Tile.SIZE)
-  gu.set_color()
+  --love.graphics.setLineWidth(1)
+  --love.graphics.setLineStyle('rough')
+  --gu.set_color('grey', 0)
+  --local ox = math.floor((self.width - game.grid.width * Tile.SIZE) / 2)
+  --local oy = math.floor((self.height - game.grid.height * Tile.SIZE - 58))
+  --for r = 0, game.grid.height - 1 do
+    --for c = 0, game.grid.width - 1 do
+      --local tx = c * Tile.SIZE + 0.5 + ox
+      --local ty = r * Tile.SIZE + 0.5 + oy
+      --love.graphics.rectangle('line', tx, ty, Tile.SIZE, Tile.SIZE)
+    --end
+  --end
 
-  if game.text ~= '' then
-    love.graphics.printf(game.text, (self.width) / 2 - 180, 310, 380, 'left')
+  --gu.set_color('red', 0)
+  --local px = game.protagonist.x * Tile.SIZE + 0.5 + ox
+  --local py = game.protagonist.y * Tile.SIZE + 0.5 + oy
+  --love.graphics.rectangle('line', px, py, Tile.SIZE, Tile.SIZE)
+  --gu.set_color()
+
+  if game.state ~= Game.GAME_OVER then
+    if game.text ~= '' then
+      love.graphics.printf(game.text, 50, 310, 380, 'left')
+    end
   end
 
   local draw_width, draw_height = love.graphics.getDimensions()
   local mw = draw_width / self.width
   local mh = draw_height / self.height
   love.graphics.setCanvas()
-  love.graphics.draw(self.static_canvas, 0, 0, 0, mw, mh)
+  if game.state ~= Game.GAME_OVER then
+    love.graphics.draw(self.static_canvas, 0, 0, 0, mw, mh)
+  end
   love.graphics.draw(self.canvas, 0, 0, 0, mw, mh)
 end
 

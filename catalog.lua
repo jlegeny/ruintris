@@ -56,6 +56,7 @@ Catalog.sprites = {
   'protagonist-hoist-l-1',
   'protagonist-hoist-l-2',
   'protagonist-hoist-l-3',
+  'protagonist-squished',
   'scroll',
  }
 
