@@ -10,15 +10,13 @@ setmetatable(Grid, {
   end,
 })
 
-Grid.new = function(width, height, matrix, script)
+Grid.new = function(width, height, matrix)
   local self = {}
   setmetatable(self, Grid)
 
   self.width = width
   self.height = height
   self.matrix = matrix
-
-  self.script = script
 
   return self
 end

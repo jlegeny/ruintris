@@ -58,6 +58,7 @@ Piece.allowed_at = function(self, grid, x, y)
     return false
   end
 
+  -- check for solids
   for c, column in ipairs(self.grid.matrix) do
     if x + c >= 1 and x + c <= grid.width then
       for r, tile in ipairs(column) do
@@ -72,9 +73,19 @@ Piece.allowed_at = function(self, grid, x, y)
     end
   end
   
-  -- check for solids
   return true
 end
+
+Piece.embed = function(self, matrix)
+  for c, column in ipairs(self.grid.matrix) do
+    for r, tile in ipairs(column) do
+      if not (tile.kind == Tile.EMPTY) then
+        matrix[self.x + c][self.y + r] = Tile(tile:transforms_to())
+      end
+    end
+  end
+end
+
 
 Piece.rotate = function(self, direction)
   if direction == Piece.CW then

@@ -23,15 +23,18 @@ Game.LEFT = 'left'
 Game.RIGHT = 'right'
 Game.STOP = 'stop'
 
-Game.new = function(grid, protagonist)
+Game.new = function(level, protagonist)
   local self = {}
   setmetatable(self, Game)
 
   self.state = Game.CTRL_PROTAGONIST
 
-  self.grid = grid
+  self.grid = level.grid
+  self.zones = level.zones
+  self.script = level.script
   self.protagonist = protagonist
   self.falling_piece = nil
+  self.pieces = {}
   self.input_gating = 0
   self.next_move = nil
   self.t = 0
@@ -54,17 +57,26 @@ Game.tick = function(self)
     if self.falling_piece:allowed_at(self.grid, self.falling_piece.x, self.falling_piece.y + 1) then
       self.falling_piece.y = self.falling_piece.y + 1
     else
-      for c, column in ipairs(self.falling_piece.grid.matrix) do
-        for r, tile in ipairs(column) do
-          if not (tile.kind == Tile.EMPTY) then
-            self.grid.matrix[self.falling_piece.x + c][self.falling_piece.y + r] = Tile(tile:transforms_to())
-          end
-        end
-      end
+      self.falling_piece:embed(self.grid.matrix)
       self.falling_piece = nil
       self.state = Game.CTRL_PROTAGONIST
     end
   end
+  for _, piece in ipairs(self.pieces) do
+    if piece:allowed_at(self.grid, piece.x, piece.y + 1) then
+      piece.y = piece.y + 1
+    else
+      piece:embed(self.grid.matrix)
+      piece.remove = true
+    end
+  end
+  for i = #self.pieces, 1, -1 do
+    if self.pieces[i].remove then
+      self.pieces[i] = self.pieces[#self.pieces]
+      self.pieces[#self.pieces] = nil
+    end
+  end
+
 end
 
 Game.update_protagonist = function(self, p)
@@ -123,6 +135,15 @@ Game.update_protagonist = function(self, p)
       end
     end
   end
+end
+
+Game.update_zones = function(self)
+  for _, zone in ipairs(self.zones.zones) do
+    zone:update(self.grid, self.zones.grid)
+  end
+end
+
+Game.post_explosion = function(self)
 end
 
 Game.update = function(self, dt)
@@ -190,16 +211,21 @@ Game.update = function(self, dt)
   local pastx, pasty = self.protagonist.x, self.protagonist.y
 
   self.grid:update(dt)
+  self.zones.grid:update(dt)
   self.protagonist:update(dt)
   if self.falling_piece then
     self.falling_piece.grid:update(dt)
   end
 
+  for _, piece in ipairs(self.pieces) do
+    piece.grid:update(dt)
+  end
+
+  self:update_zones()
   self:update_protagonist(self.protagonist)
 
   if pastx ~= self.protagonist.x or pasty ~= self.protagonist.y then
-    print(self.grid.script.trigger)
-    self.grid.script.entered(self.protagonist.x, self.protagonist.y, pastx, pasty, self)
+    self.script.entered(self.protagonist.x, self.protagonist.y, pastx, pasty, self)
   end
 
   self.t = self.t + dt
@@ -214,9 +240,9 @@ Game.keypressed = function(self, key, unicode)
   local shift = love.keyboard.isScancodeDown('lshift')
   if self.state == Game.CTRL_CONVEYOR then
     if key == 'right' then
-      self.grid.script.conveyor(Game.RIGHT, self)
+      self.script.conveyor(Game.RIGHT, self)
     elseif key == 'left' then
-      self.grid.script.conveyor(Game.LEFT, self)
+      self.script.conveyor(Game.LEFT, self)
     end
   elseif self.state == Game.CTRL_FALLING_PIECE then
     if key == 'return' and shift then
@@ -228,7 +254,7 @@ Game.keypressed = function(self, key, unicode)
   
   if self.protagonist.state == Protagonist.IDLE then
     if key == 'space' then
-      self.grid.script.trigger(self.protagonist.x, self.protagonist.y, self)
+      self.script.trigger(self.protagonist.x, self.protagonist.y, self)
     end
   end
 end

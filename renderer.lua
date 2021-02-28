@@ -51,6 +51,7 @@ Renderer.draw = function(self, game, dt)
   gu.set_color()
   local ox = math.floor((self.width - game.grid.width * Tile.SIZE) / 2)
   local oy = math.floor((self.height - game.grid.height * Tile.SIZE) - 58)
+  self:_draw_matrix(game.zones.grid.matrix, ox, oy)
   self:_draw_matrix(game.grid.matrix, ox, oy)
 
   -- draw the protagonist
@@ -64,6 +65,11 @@ Renderer.draw = function(self, game, dt)
     local pox = ox + game.falling_piece.x * Tile.SIZE
     local poy = oy + game.falling_piece.y * Tile.SIZE
     self:_draw_matrix(game.falling_piece.grid.matrix, pox, poy)
+  end
+  for _, piece in ipairs(game.pieces) do
+    local pox = ox + piece.x * Tile.SIZE
+    local poy = oy + piece.y * Tile.SIZE
+    self:_draw_matrix(piece.grid.matrix, pox, poy)
   end
 
   love.graphics.setCanvas()

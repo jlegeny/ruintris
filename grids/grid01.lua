@@ -4,6 +4,7 @@ local gu = require 'gameutil'
 local Tile = require 'tile'
 local Piece = require 'piece'
 local Game = require 'game'
+local Zone = require 'zone'
 
 local function entered(x, y, fromx, fromy, game)
   util.log('Entered {}, {} from {}, {}', x, y, fromx, fromy)
@@ -28,7 +29,7 @@ local function trigger(x, y, game)
     elseif game.state == Game.CTRL_CONVEYOR then
       game.state = Game.CTRL_PROTAGONIST
       game.text = 'Press [space] to interact with the wheel. Press [space] again to go back to exploring.'
-      game.grid.script.conveyor(Game.STOP, game)
+      game.script.conveyor(Game.STOP, game)
     end
     --local piece = Piece(Piece.L_RIGHT, Piece.GREEN)
     --piece:set_position(6, 0) 
@@ -79,7 +80,7 @@ local function conveyor(direction, game)
   end
 end
 
-local function make()
+local function make_grid()
   local grid = gu.mk_grid(15, 24)
 
   for c = 1, 15 do
@@ -93,20 +94,51 @@ local function make()
   grid.matrix[14][23] = Tile(Tile.STONE)
   grid.matrix[13][23] = Tile(Tile.STONE)
 
+  grid.matrix[6][23] = Tile(Tile.STONE)
+  grid.matrix[7][23] = Tile(Tile.STONE)
+  grid.matrix[8][23] = Tile(Tile.STONE)
+
+
   grid.matrix[10][23] = Tile(Tile.CONTROL_PANEL)
 
   set_conveyor(grid.matrix, Game.STOP)
 
-
-  grid.script = {
-    entered = entered,
-    trigger = trigger,
-    covered = covered,
-    conveyor = conveyor,
-    uncovered = uncovered,
-  }
-      
   return grid
 end
 
-return make()
+local function make_zones()
+  local grid = gu.mk_grid(15, 24)
+  local zones = {
+    Zone(Tile.ZONE_PINK, {
+      { 6, 22 },
+      { 7, 22 },
+      { 8, 22 },
+    })
+  }
+
+  for _, zone in ipairs(zones) do
+    print(zone.kind, zone.tiles)
+    for _, xy in ipairs(zone.tiles) do
+      grid.matrix[xy[1]][xy[2]] = Tile(zone.kind)
+    end
+  end
+
+  return {
+    grid = grid,
+    zones = zones,
+  }
+end
+
+local script = {
+  entered = entered,
+  trigger = trigger,
+  covered = covered,
+  conveyor = conveyor,
+  uncovered = uncovered,
+}
+
+return { 
+  grid = make_grid(),
+  zones = make_zones(), 
+  script = script
+}

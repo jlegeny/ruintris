@@ -13,6 +13,8 @@ Tile.EMPTY = 'empty'
 Tile.STONE = 'stone'
 Tile.GREEN_FALLING = 'green-falling'
 Tile.GREEN = 'green'
+Tile.ZONE_PINK = 'zone-pink'
+Tile.ZONE_PINK_EXP = 'zone-pink-exp'
 Tile.CONTROL_PANEL = 'control-panel'
 Tile.CONVEYOR_LEFT = 'conveyor-left'
 Tile.CONVEYOR_MID = 'conveyor-mid'
@@ -34,6 +36,7 @@ Tile.new = function(kind)
   self.frames = 1
   self.frame_duration = 0
   self.t = 0
+  self.loops = 0
   if kind == Tile.GREEN_FALLING then
     self.frames = 4
     self.frame_duration = 0.25
@@ -46,6 +49,12 @@ Tile.new = function(kind)
     kind == Tile.CONVEYOR_RIGHT_CCW 
     then
     self.frames = 3
+    self.frame_duration = 0.16
+  elseif kind == Tile.ZONE_PINK then
+    self.frames = 3
+    self.frame_duration = 0.32
+  elseif kind == Tile.ZONE_PINK_EXP then
+    self.frames = 4
     self.frame_duration = 0.16
   end
 
@@ -69,6 +78,10 @@ Tile.texture_name = function(self)
     elseif self.frame == 3 then
       return 'tile-green-1'
     end
+  elseif self.kind == Tile.ZONE_PINK then
+    return 'tile-zone-pink-${f}' % { f = self.frame }
+  elseif self.kind == Tile.ZONE_PINK_EXP then
+    return 'tile-zone-pink-exp-${f}' % { f = self.frame }
   elseif self.kind == Tile.CONVEYOR_LEFT then
     return 'tile-conveyor-left-0'
   elseif self.kind == Tile.CONVEYOR_MID then
@@ -100,6 +113,9 @@ Tile.update = function(self, dt)
 
   self.t = self.t + dt
   if self.t >= self.frame_duration then
+    if self.frame == self.frames - 1 then
+      self.loops = self.loops + 1
+    end
     self.frame = (self.frame + 1) % self.frames
     self.t = self.t - self.frame_duration
   end

@@ -66,6 +66,10 @@ function love.keypressed(key, unicode)
       piece:set_position(6, 4)
       game:add_falling_piece(piece)
       game.state = Game.CTRL_FALLING_PIECE
+    elseif key == 'o' then
+      local piece = Piece(Piece.S_LEFT, Piece.GREEN)
+      piece:set_position(math.random(1, 12), 4)
+      table.insert(game.pieces, piece)
     end
   end
 
