@@ -1,4 +1,5 @@
 local gu = require 'gameutil'
+local matrix = require 'matrix'
 
 local Tile = require 'tile'
 
@@ -12,6 +13,9 @@ setmetatable(Piece, {
 })
 
 Piece.L_RIGHT = 'l-right'
+Piece.L_LEFT = 'l-left'
+Piece.S_RIGHT = 's-right'
+Piece.S_LEFT = 's-left'
 
 Piece.GREEN = 'green'
 
@@ -29,13 +33,7 @@ Piece.new = function(shape, color)
   self.ox = 0
   self.oy = 0
 
-  self.grid = nil
-  if self.shape == Piece.L_RIGHT then
-    self.grid = make_l_right(self.color)
-  else
-    io.stderr:write('Unknown piece shape')
-    love.event.quit(1)
-  end
+  self.grid = make(self.shape, self.color)
 
   return self
 end
@@ -79,12 +77,19 @@ Piece.allowed_at = function(self, grid, x, y)
 end
 
 Piece.rotate = function(self, direction)
+  if direction == Piece.CW then
+    matrix.transpose(self.grid.matrix)
+    matrix.reverse_rows(self.grid.matrix)
+  elseif direction == Piece.CCW then
+    matrix.transpose(self.grid.matrix)
+    matrix.reverse_columns(self.grid.matrix)
+  end
 end
 
 Piece.update = function(dt)
 end
 
-function make_l_right(color)
+function make(shape, color)
   local grid = gu.mk_grid(3, 3)
 
   local tile_kind
@@ -95,10 +100,31 @@ function make_l_right(color)
     love.event.quit(1)
   end
 
-  grid.matrix[2][1] = Tile(tile_kind)
-  grid.matrix[2][2] = Tile(tile_kind)
-  grid.matrix[2][3] = Tile(tile_kind)
-  grid.matrix[3][3] = Tile(tile_kind)
+  if shape == Piece.L_RIGHT then
+    grid.matrix[2][1] = Tile(tile_kind)
+    grid.matrix[2][2] = Tile(tile_kind)
+    grid.matrix[2][3] = Tile(tile_kind)
+    grid.matrix[3][3] = Tile(tile_kind)
+  elseif shape == Piece.L_LEFT then
+    grid.matrix[2][1] = Tile(tile_kind)
+    grid.matrix[2][2] = Tile(tile_kind)
+    grid.matrix[2][3] = Tile(tile_kind)
+    grid.matrix[1][3] = Tile(tile_kind)
+  elseif shape == Piece.S_RIGHT then
+    grid.matrix[1][1] = Tile(tile_kind)
+    grid.matrix[1][2] = Tile(tile_kind)
+    grid.matrix[2][2] = Tile(tile_kind)
+    grid.matrix[2][3] = Tile(tile_kind)
+  elseif shape == Piece.S_LEFT then
+    grid.matrix[2][1] = Tile(tile_kind)
+    grid.matrix[1][2] = Tile(tile_kind)
+    grid.matrix[2][2] = Tile(tile_kind)
+    grid.matrix[1][3] = Tile(tile_kind)
+  else
+    io.stderr:write('Unknown piece shape\n')
+    love.event.quit(1)
+  end
+
 
   return grid
 end

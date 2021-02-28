@@ -53,15 +53,20 @@ function love.load()
   renderer:resize(RENDER_WIDTH, RENDER_HEIGHT)
   overlay:resize(RENDER_WIDTH, RENDER_HEIGHT)
 
-  local piece = Piece(Piece.L_RIGHT, Piece.GREEN)
-  -- game:add_falling_piece(piece)
   game.protagonist:set_position(10, 22, 0, 0)
   --game.protagonist:set_position(0, 0, 0, 0)
 end
 
 function love.keypressed(key, unicode)
-  if key == 'r' and util.debug then
-    love.event.quit('restart')
+  if util.debug then
+    if key == 'r' then
+      love.event.quit('restart')
+    elseif key == 'p' then
+      local piece = Piece(Piece.L_RIGHT, Piece.GREEN)
+      piece:set_position(6, 4)
+      game:add_falling_piece(piece)
+      game.state = Game.CTRL_FALLING_PIECE
+    end
   end
 
   game:keypressed(key, unicode)

@@ -1,4 +1,5 @@
 local Protagonist = require 'protagonist'
+local Piece = require 'piece'
 local Tile = require 'tile'
 
 local Game = {}
@@ -210,13 +211,21 @@ end
 
 Game.keypressed = function(self, key, unicode)
   key = love.keyboard.getScancodeFromKey(key)
+  local shift = love.keyboard.isScancodeDown('lshift')
   if self.state == Game.CTRL_CONVEYOR then
     if key == 'right' then
       self.grid.script.conveyor(Game.RIGHT, self)
     elseif key == 'left' then
       self.grid.script.conveyor(Game.LEFT, self)
     end
+  elseif self.state == Game.CTRL_FALLING_PIECE then
+    if key == 'return' and shift then
+      self.falling_piece:rotate(Piece.CCW)
+    elseif key == 'return' then
+      self.falling_piece:rotate(Piece.CW)
+    end
   end
+  
   if self.protagonist.state == Protagonist.IDLE then
     if key == 'space' then
       self.grid.script.trigger(self.protagonist.x, self.protagonist.y, self)
