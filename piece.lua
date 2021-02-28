@@ -1,4 +1,5 @@
 local gu = require 'gameutil'
+local util = require 'util'
 local matrix = require 'matrix'
 
 local Tile = require 'tile'
@@ -22,16 +23,25 @@ Piece.GREEN = 'green'
 Piece.CW = 'cw'
 Piece.CCW = 'ccw'
 
+Piece._next_id = 0
+
+Piece._get_id = function(self)
+  Piece._next_id = Piece._next_id + 1
+  return Piece._next_id
+end
+
 Piece.new = function(shape, color)
   local self = {}
   setmetatable(self, Piece)
 
+  self.id = self:_get_id()
   self.shape = shape
   self.color = color
   self.x = 0
   self.y = 0
   self.ox = 0
   self.oy = 0
+  self.embeddable = true
 
   self.grid = make(self.shape, self.color)
 
@@ -46,6 +56,7 @@ Piece.new_empty = function(width, height)
   self.y = 0
   self.ox = 0
   self.oy = 0
+  self.embeddable = true
 
   self.grid = gu.mk_grid(width, height)
   
@@ -110,7 +121,28 @@ Piece.rotate = function(self, direction)
   end
 end
 
+Piece.make_controlled = function(self)
+  for c, column in ipairs(self.grid.matrix) do
+    for r, tile in ipairs(column) do
+      if not (tile.kind == Tile.EMPTY) then
+        self.grid.matrix[c][r] = Tile(tile:controls_to())
+      end
+    end
+  end
+end
+
 Piece.update = function(dt)
+end
+
+local _shapes = {
+  [1] = Piece.L_RIGHT,
+  [2] = Piece.L_LEFT,
+  [3] = Piece.S_RIGHT,
+  [4] = Piece.S_LEFT,
+}
+
+Piece.random_shape = function()
+  return _shapes[math.random(1, 4)]
 end
 
 function make(shape, color)
@@ -118,7 +150,7 @@ function make(shape, color)
 
   local tile_kind
   if color == Piece.GREEN then
-    tile_kind = Tile.GREEN_FALLING
+    tile_kind = Tile.GREEN
   else
     io.stderr:write('Unknown piece color\n')
     love.event.quit(1)
@@ -145,7 +177,7 @@ function make(shape, color)
     grid.matrix[2][2] = Tile(tile_kind)
     grid.matrix[1][3] = Tile(tile_kind)
   else
-    io.stderr:write('Unknown piece shape\n')
+    io.stderr:write('Unknown piece shape ', util.str(shape), '\n')
     love.event.quit(1)
   end
 

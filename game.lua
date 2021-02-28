@@ -54,6 +54,20 @@ Game.add_falling_piece = function (self, piece)
   self.falling_piece = piece
 end
 
+Game.remove_piece = function(self, id)
+  local index = nil
+  for i, piece in ipairs(self.pieces) do
+    if piece.id == id then
+      index = i
+      break
+    end
+  end
+
+  if index then
+    table.remove(self.pieces, index)
+  end
+end
+
 Game.tick = function(self)
   if self.falling_piece then
     if self.falling_piece:allowed_at(self.grid, self.falling_piece.x, self.falling_piece.y + 1) then
@@ -67,7 +81,7 @@ Game.tick = function(self)
   for _, piece in ipairs(self.pieces) do
     if piece:allowed_at(self.grid, piece.x, piece.y + 1) then
       piece.y = piece.y + 1
-    else
+    elseif piece.embeddable then
       piece:embed(self.grid.matrix)
       piece.remove = true
     end
@@ -186,6 +200,9 @@ Game.post_explosion = function(self)
         elseif up and up ~= 0 and (is_solid == up_solid or is_solid) then
           stencil[c][r] = up
           table.insert(groups[up], {c, r})
+          if is_solid then
+            solids[up] = true
+          end
         end
       end
     end
@@ -216,12 +233,12 @@ Game.post_explosion = function(self)
     end
   end
 
-  for id, xys in pairs(pieces_to_make) do
-    print(id, '..')
-    for _, xy in ipairs(xys) do
-      print('  ' .. xy[1], xy[2])
-    end
-  end
+  --for id, xys in pairs(pieces_to_make) do
+    --print(id, '..')
+    --for _, xy in ipairs(xys) do
+      --print('  ' .. xy[1], xy[2])
+    --end
+  --end
 
   for id, xys in pairs(pieces_to_make) do 
     local minx, maxx = self.grid.width, 1
@@ -241,13 +258,18 @@ Game.post_explosion = function(self)
     table.insert(self.pieces, piece)
   end
 
-  --for r = 1, self.grid.height do
-    --local s = ''
-    --for c = 1, self.grid.width do
-      --s = s .. stencil[c][r] .. '\t'
-    --end
-    --print(s)
-  --end
+  for r = 1, self.grid.height do
+    local s = ''
+    for c = 1, self.grid.width do
+      local sts = stencil[c][r]  
+      local ss = 'n'
+      if solids[parents[sts]] then
+        ss = 'S'
+      end
+      s = s .. ss .. sts .. '\t'
+    end
+    print(s)
+  end
   --for k, v in pairs(parents) do
     --print(k .. ' --> ' .. v)
   --end
@@ -334,6 +356,8 @@ Game.update = function(self, dt)
   if pastx ~= self.protagonist.x or pasty ~= self.protagonist.y then
     self.script.entered(self.protagonist.x, self.protagonist.y, pastx, pasty, self)
   end
+
+  self.script.update(dt, self)
 
   self.t = self.t + dt
   if self.t >= TICK_DURATION then

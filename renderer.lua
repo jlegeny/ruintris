@@ -51,6 +51,7 @@ Renderer.draw = function(self, game, dt)
   gu.set_color()
   local ox = math.floor((self.width - game.grid.width * Tile.SIZE) / 2)
   local oy = math.floor((self.height - game.grid.height * Tile.SIZE) - 58)
+  love.graphics.setScissor(ox, oy, game.grid.width * Tile.SIZE, game.grid.height * Tile.SIZE)
   self:_draw_matrix(game.zones.grid.matrix, ox, oy)
   self:_draw_matrix(game.grid.matrix, ox, oy)
 
@@ -67,11 +68,12 @@ Renderer.draw = function(self, game, dt)
     self:_draw_matrix(game.falling_piece.grid.matrix, pox, poy)
   end
   for _, piece in ipairs(game.pieces) do
-    local pox = ox + piece.x * Tile.SIZE
-    local poy = oy + piece.y * Tile.SIZE
+    local pox = ox + piece.x * Tile.SIZE + piece.ox
+    local poy = oy + piece.y * Tile.SIZE + piece.oy
     self:_draw_matrix(piece.grid.matrix, pox, poy)
   end
 
+  love.graphics.setScissor()
   love.graphics.setCanvas()
 
   local draw_width, draw_height = love.graphics.getDimensions()

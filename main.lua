@@ -64,6 +64,7 @@ function love.keypressed(key, unicode)
     elseif key == 'p' then
       local piece = Piece(Piece.L_RIGHT, Piece.GREEN)
       piece:set_position(6, 4)
+      piece:make_controlled()
       game:add_falling_piece(piece)
       game.state = Game.CTRL_FALLING_PIECE
     elseif key == 'o' then
