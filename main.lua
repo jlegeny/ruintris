@@ -70,6 +70,11 @@ function love.keypressed(key, unicode)
       local piece = Piece(Piece.S_LEFT, Piece.GREEN)
       piece:set_position(math.random(1, 12), 4)
       table.insert(game.pieces, piece)
+    elseif key == 'u' then
+      local piece = Piece(Piece.L_RIGHT, Piece.GREEN)
+      piece:rotate(Piece.CCW)
+      piece:set_position(5, 19)
+      table.insert(game.pieces, piece)
     end
   end
 

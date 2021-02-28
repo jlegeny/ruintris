@@ -13,6 +13,7 @@ Tile.EMPTY = 'empty'
 Tile.STONE = 'stone'
 Tile.GREEN_FALLING = 'green-falling'
 Tile.GREEN = 'green'
+Tile.GREEN_EXP = 'green-exp'
 Tile.ZONE_PINK = 'zone-pink'
 Tile.ZONE_PINK_EXP = 'zone-pink-exp'
 Tile.CONTROL_PANEL = 'control-panel'
@@ -53,6 +54,10 @@ Tile.new = function(kind)
   elseif kind == Tile.ZONE_PINK then
     self.frames = 3
     self.frame_duration = 0.32
+  elseif kind == Tile.GREEN_EXP then
+    self.frames = 4
+    self.frame_duration = 0.16
+    self.exploding = true
   elseif kind == Tile.ZONE_PINK_EXP then
     self.frames = 4
     self.frame_duration = 0.16
@@ -78,6 +83,8 @@ Tile.texture_name = function(self)
     elseif self.frame == 3 then
       return 'tile-green-1'
     end
+  elseif self.kind == Tile.GREEN_EXP then
+    return 'tile-green-exp-${f}' % { f = self.frame }
   elseif self.kind == Tile.ZONE_PINK then
     return 'tile-zone-pink-${f}' % { f = self.frame }
   elseif self.kind == Tile.ZONE_PINK_EXP then
@@ -121,9 +128,15 @@ Tile.update = function(self, dt)
   end
 end
 
-Tile.transforms_to = function(self)
+Tile.embeds_to = function(self)
   if self.kind == Tile.GREEN_FALLING then
     return Tile.GREEN
+  end
+end
+
+Tile.explodes_to = function(self)
+  if self.kind == Tile.GREEN then
+    return Tile.GREEN_EXP
   end
 end
 

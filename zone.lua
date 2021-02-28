@@ -29,7 +29,8 @@ end
 
 Zone.is_filled = function(self, grid)
   for _, xy in ipairs(self.tiles) do
-    if grid.matrix[xy[1]][xy[2]].kind == Tile.EMPTY then
+    local tile = grid.matrix[xy[1]][xy[2]]
+    if tile.kind == Tile.EMPTY or tile.exploding then
       return false
     end
   end
@@ -41,23 +42,25 @@ Zone.explode = function(self, grid, zone_grid)
   util.log('Zone is exploding')
   self.exploding = true
   for _, xy in ipairs(self.tiles) do
-    grid.matrix[xy[1]][xy[2]] = Tile(Tile.EMPTY)
+    grid.matrix[xy[1]][xy[2]] = Tile(grid.matrix[xy[1]][xy[2]]:explodes_to())
     zone_grid.matrix[xy[1]][xy[2]] = Tile(self.explodes_to)
   end
 end
 
-Zone.update = function(self, grid, zone_grid)
-  if self:is_filled(grid) then
-    self:explode(grid, zone_grid)
+Zone.update = function(self, game)
+  if self:is_filled(game.grid) then
+    self:explode(game.grid, game.zones.grid)
   end
   if self.exploding then
     local any_xy = self.tiles[1]
-    local any_tile = zone_grid.matrix[any_xy[1]][any_xy[2]]
+    local any_tile = game.zones.grid.matrix[any_xy[1]][any_xy[2]]
     if any_tile.loops > 0 then
       for _, xy in ipairs(self.tiles) do
-        zone_grid.matrix[xy[1]][xy[2]] = Tile(self.kind)
+        game.grid.matrix[xy[1]][xy[2]] = Tile(Tile.EMPTY)
+        game.zones.grid.matrix[xy[1]][xy[2]] = Tile(self.kind)
       end
       self.exploding = false
+      game:post_explosion()
     end
   end
 end

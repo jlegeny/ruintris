@@ -1,3 +1,5 @@
+local matrix = require 'matrix'
+
 local Protagonist = require 'protagonist'
 local Piece = require 'piece'
 local Tile = require 'tile'
@@ -139,11 +141,33 @@ end
 
 Game.update_zones = function(self)
   for _, zone in ipairs(self.zones.zones) do
-    zone:update(self.grid, self.zones.grid)
+    zone:update(self)
   end
 end
 
 Game.post_explosion = function(self)
+  local stencil = matrix.new(self.grid.width, self.grid.height)
+  local solids = {}
+  local volatiles = {}
+  local parents = {}
+
+  local next_id = 1
+
+  for c, column in ipairs(self.grid.matrix) do
+    for r, tile in ipairs(column) do
+      if self.grid.matrix[c][r].kind ~= Tile.EMPTY then
+        stencil[c][r] = next_id
+        parents[next_id] = next_id
+        next_id = next_id + 1
+        if c > 1 and stencil[c - 1][r] ~= 0 then
+          stencil[c][r] = stencil[c - 1][r]
+        end
+        if r > 1 and stencil[c][r - 1] then
+          parents[stencil[c][r]] = stencil[c][r - 1]
+        end
+      end
+    end
+  end
 end
 
 Game.update = function(self, dt)

@@ -80,12 +80,11 @@ Piece.embed = function(self, matrix)
   for c, column in ipairs(self.grid.matrix) do
     for r, tile in ipairs(column) do
       if not (tile.kind == Tile.EMPTY) then
-        matrix[self.x + c][self.y + r] = Tile(tile:transforms_to())
+        matrix[self.x + c][self.y + r] = Tile(tile:embeds_to())
       end
     end
   end
 end
-
 
 Piece.rotate = function(self, direction)
   if direction == Piece.CW then

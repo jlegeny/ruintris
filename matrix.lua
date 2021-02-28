@@ -1,5 +1,18 @@
 local matrix = {}
 
+matrix.new = function(cols, rows)
+  local m = {}
+
+  for c = 1, cols do
+    m[c] = {}
+    for r = 1, rows do
+      m[c][r] = 0
+    end
+  end
+
+  return m
+end
+
 matrix.transpose = function(m)
   local columns = #m
   local rows = #m[1]
