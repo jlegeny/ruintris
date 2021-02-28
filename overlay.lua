@@ -43,10 +43,18 @@ Overlay.draw = function(self, game, dt)
   love.graphics.setCanvas(self.canvas)
   love.graphics.clear()
 
+  local midscroll = false
+
   if game.state == Game.GAME_OVER then
     gu.set_color()
     love.graphics.draw(self.sprites:get('scroll').texture, 0, 120)
     love.graphics.printf('GAME OVER', 0, 155, 480, 'center')
+    midscroll = true
+  elseif game.state == Game.WINNER then
+    gu.set_color()
+    love.graphics.draw(self.sprites:get('scroll').texture, 0, 120)
+    love.graphics.printf('Thank you for playing.\nMade by yozy for the 11th Alakajam', 0, 150, 480, 'center')
+    midscroll = true
   end
 
   --love.graphics.setLineWidth(1)
@@ -68,7 +76,7 @@ Overlay.draw = function(self, game, dt)
   --love.graphics.rectangle('line', px, py, Tile.SIZE, Tile.SIZE)
   --gu.set_color()
 
-  if game.state ~= Game.GAME_OVER then
+  if not midscroll then
     if game.text ~= '' then
       love.graphics.printf(game.text, 50, 310, 380, 'left')
     end
@@ -78,7 +86,7 @@ Overlay.draw = function(self, game, dt)
   local mw = draw_width / self.width
   local mh = draw_height / self.height
   love.graphics.setCanvas()
-  if game.state ~= Game.GAME_OVER then
+  if not midscroll then
     love.graphics.draw(self.static_canvas, 0, 0, 0, mw, mh)
   end
   love.graphics.draw(self.canvas, 0, 0, 0, mw, mh)

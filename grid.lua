@@ -24,7 +24,7 @@ end
 Grid.passable = function(self, x, y)
   local tile_at = self.matrix[x + 1][y + 1]
   util.log('Tile at {}, {} is {}', x + 1, y + 1, tile_at.kind)
-  return tile_at.kind == Tile.EMPTY or tile_at.kind == Tile.CONTROL_PANEL
+  return tile_at.kind == Tile.EMPTY or tile_at.kind == Tile.CONTROL_PANEL or tile_at.kind == Tile.DOOR_TOP or tile_at.kind == Tile.DOOR_BOTTOM
 end
 
 Grid.update = function(self, dt)

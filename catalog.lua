@@ -43,6 +43,12 @@ Catalog.tiles = {
   'tile-conveyor-left-2',
   'tile-conveyor-mid-2',
   'tile-conveyor-right-2',
+  'tile-door-top-0',
+  'tile-door-top-1',
+  'tile-door-top-2',
+  'tile-door-bottom-0',
+  'tile-door-bottom-1',
+  'tile-door-bottom-2',
 }
 Catalog.sprites = {
   'protagonist-idle-r',

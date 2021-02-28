@@ -29,8 +29,8 @@ local level_str = {
   '               ',
   '               ',
   '               ',
-  '               ',
-  '               ',
+  '              x',
+  '              X',
   '         ## ###',
   '              #',
   '              #',
@@ -106,6 +106,8 @@ local _char_to_tile = {
   [' '] = Tile.EMPTY,
   ['#'] = Tile.STONE,
   ['v'] = Tile.CONTROL_PANEL,
+  ['x'] = Tile.DOOR_TOP,
+  ['X'] = Tile.DOOR_BOTTOM,
 }
 
 local function make_grid()
@@ -158,8 +160,9 @@ script.entered = function(x, y, fromx, fromy, game)
   local fr, fc = fromx + 1, fromy + 1
   if r == 10 and c == 23 then
     game.text = i18n.help_wheel
-  end
-  if fr == 10 and fc == 23 then
+  elseif r == 15 and c == 13 then
+    game.state = Game.WINNER
+  elseif fr == 10 and fc == 23 then
     game.text = ''
   end
 end

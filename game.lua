@@ -21,6 +21,7 @@ Game.CTRL_CONVEYOR = 'ctrl-conveyor'
 Game.CTRL_FALLING_PIECE = 'ctrl-falling-piece'
 Game.CTRL_NONE = 'ctrl-none'
 Game.GAME_OVER = 'game-over'
+Game.WINNER = 'winner'
 
 Game.LEFT = 'left'
 Game.RIGHT = 'right'

@@ -29,6 +29,8 @@ Tile.CONVEYOR_RIGHT_CW = 'conveyor-right-cw'
 Tile.CONVEYOR_LEFT_CCW = 'conveyor-left-ccw'
 Tile.CONVEYOR_MID_CCW = 'conveyor-mid-ccw'
 Tile.CONVEYOR_RIGHT_CCW = 'conveyor-right-ccw'
+Tile.DOOR_TOP = 'door-top'
+Tile.DOOR_BOTTOM = 'door-bottom'
 
 
 Tile.new = function(kind)
@@ -66,6 +68,9 @@ Tile.new = function(kind)
   elseif kind == Tile.ZONE_PINK_EXP then
     self.frames = 4
     self.frame_duration = 0.16
+  elseif kind == Tile.DOOR_TOP or kind == Tile.DOOR_BOTTOM then
+    self.frames = 4
+    self.frame_duration = 0.20
   end
 
   return self
@@ -139,6 +144,18 @@ Tile.texture_name = function(self)
     return 'tile-conveyor-right-${f}' % { f = self.frame }
   elseif self.kind == Tile.CONVEYOR_RIGHT_CCW then
     return 'tile-conveyor-right-${f}' % { f = 2 - self.frame }
+  elseif self.kind == Tile.DOOR_TOP then
+    local frame = self.frame
+    if frame == 3 then
+      frame = 1
+    end
+    return 'tile-door-top-${f}' % { f = frame }
+  elseif self.kind == Tile.DOOR_BOTTOM then
+    local frame = self.frame
+    if frame == 3 then
+      frame = 1
+    end
+    return 'tile-door-bottom-${f}' % { f = frame }
   elseif self.kind == Tile.CONTROL_PANEL then
     return 'tile-control-panel'
   end
