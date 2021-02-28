@@ -148,26 +148,109 @@ end
 Game.post_explosion = function(self)
   local stencil = matrix.new(self.grid.width, self.grid.height)
   local solids = {}
-  local volatiles = {}
   local parents = {}
+  local groups = {}
 
   local next_id = 1
 
   for c, column in ipairs(self.grid.matrix) do
     for r, tile in ipairs(column) do
       if self.grid.matrix[c][r].kind ~= Tile.EMPTY then
-        stencil[c][r] = next_id
-        parents[next_id] = next_id
-        next_id = next_id + 1
-        if c > 1 and stencil[c - 1][r] ~= 0 then
-          stencil[c][r] = stencil[c - 1][r]
+        local is_solid = not not self.grid.matrix[c][r].anchor 
+        local left = nil
+        local left_solid = false
+        if c > 1 then
+          left = stencil[c - 1][r]
+          left_solid = not not self.grid.matrix[c - 1][r].anchor
         end
-        if r > 1 and stencil[c][r - 1] then
-          parents[stencil[c][r]] = stencil[c][r - 1]
+        local up = nil
+        local up_solid = false
+        if r > 1 then
+          up = stencil[c][r - 1]
+          up_solid = not not self.grid.matrix[c][r - 1].anchor
+        end
+        if (not left or left == 0) and (not up or up == 0) then
+          stencil[c][r] = next_id
+          parents[next_id] = next_id
+          groups[next_id] = { {c, r} }
+          if is_solid then
+            solids[next_id] = true
+          end
+          next_id = next_id + 1
+        elseif left and left ~= 0 and is_solid == left_solid then
+          stencil[c][r] = left
+          table.insert(groups[left], {c, r})
+          if up and up ~= 0 then
+            parents[up] = stencil[c][r]
+          end
+        elseif up and up ~= 0 and (is_solid == up_solid or is_solid) then
+          stencil[c][r] = up
+          table.insert(groups[up], {c, r})
         end
       end
     end
   end
+
+  function gp(id)
+    local i = id
+    local is_solid = solids[i]
+    while i ~= parents[i] do
+      i = parents[i]
+      is_solid = is_solid or solids[i]
+    end
+    solids[i] = is_solid
+    parents[id] = i
+    return i
+  end
+
+  local pieces_to_make = {}
+  for id, xys in pairs(groups) do
+    local parent = gp(id)
+    if not solids[parent] then
+      if not pieces_to_make[parent] then
+        pieces_to_make[parent] = {}
+      end
+      for _, xy in ipairs(xys) do
+        table.insert(pieces_to_make[parent], xy)
+      end
+    end
+  end
+
+  for id, xys in pairs(pieces_to_make) do
+    print(id, '..')
+    for _, xy in ipairs(xys) do
+      print('  ' .. xy[1], xy[2])
+    end
+  end
+
+  for id, xys in pairs(pieces_to_make) do 
+    local minx, maxx = self.grid.width, 1
+    local miny, maxy = self.grid.height, 1
+    for _, xy in ipairs(xys) do
+      minx = math.min(minx, xy[1])
+      maxx = math.max(maxx, xy[1])
+      miny = math.min(miny, xy[2])
+      maxy = math.max(maxy, xy[2])
+    end
+    local piece = Piece.new_empty(maxx - minx + 1, maxy - miny + 1)
+    for _, xy in pairs(xys) do
+      piece.grid.matrix[xy[1] - minx + 1][xy[2] - miny + 1] = Tile(self.grid.matrix[xy[1]][xy[2]].kind)
+      self.grid.matrix[xy[1]][xy[2]] = Tile(Tile.EMPTY)
+    end
+    piece:set_position(minx - 1, miny - 1)
+    table.insert(self.pieces, piece)
+  end
+
+  --for r = 1, self.grid.height do
+    --local s = ''
+    --for c = 1, self.grid.width do
+      --s = s .. stencil[c][r] .. '\t'
+    --end
+    --print(s)
+  --end
+  --for k, v in pairs(parents) do
+    --print(k .. ' --> ' .. v)
+  --end
 end
 
 Game.update = function(self, dt)

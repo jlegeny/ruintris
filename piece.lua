@@ -38,6 +38,20 @@ Piece.new = function(shape, color)
   return self
 end
 
+Piece.new_empty = function(width, height)
+  local self = {}
+  setmetatable(self, Piece)
+
+  self.x = 0
+  self.y = 0
+  self.ox = 0
+  self.oy = 0
+
+  self.grid = gu.mk_grid(width, height)
+  
+  return self
+end
+
 Piece.set_position = function(self, x, y)
   self.x = x
   self.y = y

@@ -33,6 +33,8 @@ Tile.new = function(kind)
   setmetatable(self, Tile)
 
   self.kind = kind
+  self.anchor = self:is_anchor()
+
   self.frame = 0
   self.frames = 1
   self.frame_duration = 0
@@ -65,6 +67,19 @@ Tile.new = function(kind)
 
   return self
 end
+
+Tile.is_anchor = function(self)
+  return self.kind == Tile.STONE or
+    self.kind == Tile.CONVEYOR_LEFT or
+    self.kind == Tile.CONVEYOR_MID or
+    self.kind == Tile.CONVEYOR_RIGHT or
+    self.kind == Tile.CONVEYOR_LEFT_CW or
+    self.kind == Tile.CONVEYOR_MID_CW or 
+    self.kind == Tile.CONVEYOR_RIGHT_CW or
+    self.kind == Tile.CONVEYOR_LEFT_CCW or
+    self.kind == Tile.CONVEYOR_MID_CCW or 
+    self.kind == Tile.CONVEYOR_RIGHT_CCW 
+ end
 
 Tile.texture_name = function(self)
   if self.kind == Tile.EMPTY then
@@ -129,7 +144,9 @@ Tile.update = function(self, dt)
 end
 
 Tile.embeds_to = function(self)
-  if self.kind == Tile.GREEN_FALLING then
+  if self.kind == Tile.GREEN then
+    return Tile.GREEN
+  elseif self.kind == Tile.GREEN_FALLING then
     return Tile.GREEN
   end
 end
