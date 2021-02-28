@@ -76,7 +76,8 @@ local function generate_pieces(game)
     return
   end
   local left_shape = Piece.random_shape()
-  left = Piece(left_shape, Piece.GREEN)
+  local left_color = Piece.random_color()
+  left = Piece(left_shape, left_color)
   left.embeddable = false
   local minx, maxx, miny, maxy = gu.matrix_bounds(left.grid.matrix)
   left:set_position(1, 2 - maxy - 1)
@@ -85,9 +86,13 @@ local function generate_pieces(game)
   while right_shape == left_shape do
     right_shape = Piece.random_shape()
   end
-  right = Piece(right_shape, Piece.GREEN)
+  local right_color = Piece.random_color()
+  while right_color == left_color do
+    right_color = Piece.random_color()
+  end
+  right = Piece(right_shape, right_color)
   right.embeddable = false
-  local minx, maxx, miny, maxy = gu.matrix_bounds(left.grid.matrix)
+  local minx, maxx, miny, maxy = gu.matrix_bounds(right.grid.matrix)
   right:set_position(11, 2 - maxy - 1)
 
   state.piece_left = left

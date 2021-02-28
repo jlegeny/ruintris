@@ -261,18 +261,18 @@ Game.post_explosion = function(self)
     table.insert(self.pieces, piece)
   end
 
-  for r = 1, self.grid.height do
-    local s = ''
-    for c = 1, self.grid.width do
-      local sts = stencil[c][r]  
-      local ss = 'n'
-      if solids[parents[sts]] then
-        ss = 'S'
-      end
-      s = s .. ss .. sts .. '\t'
-    end
-    print(s)
-  end
+  --for r = 1, self.grid.height do
+    --local s = ''
+    --for c = 1, self.grid.width do
+      --local sts = stencil[c][r]  
+      --local ss = 'n'
+      --if solids[parents[sts]] then
+        --ss = 'S'
+      --end
+      --s = s .. ss .. sts .. '\t'
+    --end
+    --print(s)
+  --end
   --for k, v in pairs(parents) do
     --print(k .. ' --> ' .. v)
   --end

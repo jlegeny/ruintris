@@ -30,7 +30,7 @@ end
 Background.pre_render = function(self)
   love.graphics.setCanvas(self.static_canvas)
   love.graphics.clear()
-  love.graphics.draw(self.sprites:get('dusk').texture, 0, 0)
+  love.graphics.draw(self.sprites:get('bg01').texture, 0, 0)
   love.graphics.setCanvas()
 end
 

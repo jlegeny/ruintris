@@ -9,7 +9,7 @@ setmetatable(Catalog, {
   end,
 })
 
-Catalog.backgrounds = { 'dusk', }
+Catalog.backgrounds = { 'bg01', }
 Catalog.tiles = {
   'tile-stone',
   'tile-green-0',
@@ -19,6 +19,13 @@ Catalog.tiles = {
   'tile-green-exp-1',
   'tile-green-exp-2',
   'tile-green-exp-3',
+  'tile-red-0',
+  'tile-red-1',
+  'tile-red-2',
+  'tile-red-exp-0',
+  'tile-red-exp-1',
+  'tile-red-exp-2',
+  'tile-red-exp-3',
   'tile-zone-pink-0',
   'tile-zone-pink-1',
   'tile-zone-pink-2',
@@ -69,7 +76,7 @@ Catalog.new = function(image_names)
   self.image_names = image_names
 
   for i, name in ipairs(image_names) do
-    print('Loading asset ', name)
+    util.log('Loading asset ', name)
     local texture = love.graphics.newImage('assets/${name}.png' % { name = name })
     self.image_data[name] = {
       index = i,

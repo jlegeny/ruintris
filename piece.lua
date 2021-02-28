@@ -20,6 +20,7 @@ Piece.S_LEFT = 's-left'
 Piece.T = 't'
 
 Piece.GREEN = 'green'
+Piece.RED = 'red'
 
 Piece.CW = 'cw'
 Piece.CCW = 'ccw'
@@ -103,7 +104,6 @@ Piece.allowed_at = function(self, grid, x, y)
 end
 
 Piece.squishes = function(self, x, y)
-  print('t', x, y)
   for c, column in ipairs(self.grid.matrix) do
     for r, tile in ipairs(column) do
       if tile.kind ~= Tile.EMPTY then
@@ -162,12 +162,23 @@ Piece.random_shape = function()
   return _shapes[math.random(1, 5)]
 end
 
+local _colors = {
+  [1] = Piece.GREEN,
+  [2] = Piece.RED,
+}
+
+Piece.random_color = function()
+  return _colors[math.random(1, 2)]
+end
+
 function make(shape, color)
   local grid = gu.mk_grid(3, 3)
 
   local tile_kind
   if color == Piece.GREEN then
     tile_kind = Tile.GREEN
+  elseif color == Piece.RED then
+    tile_kind = Tile.RED
   else
     io.stderr:write('Unknown piece color\n')
     love.event.quit(1)

@@ -14,6 +14,9 @@ Tile.STONE = 'stone'
 Tile.GREEN_FLASHING = 'green-flashing'
 Tile.GREEN = 'green'
 Tile.GREEN_EXP = 'green-exp'
+Tile.RED_FLASHING = 'red-flashing'
+Tile.RED = 'red'
+Tile.RED_EXP = 'red-exp'
 Tile.ZONE_PINK = 'zone-pink'
 Tile.ZONE_PINK_EXP = 'zone-pink-exp'
 Tile.CONTROL_PANEL = 'control-panel'
@@ -40,7 +43,7 @@ Tile.new = function(kind)
   self.frame_duration = 0
   self.t = 0
   self.loops = 0
-  if kind == Tile.GREEN_FLASHING then
+  if kind == Tile.GREEN_FLASHING or kind == Tile.RED_FLASHING then
     self.frames = 4
     self.frame_duration = 0.25
   elseif 
@@ -56,7 +59,7 @@ Tile.new = function(kind)
   elseif kind == Tile.ZONE_PINK then
     self.frames = 3
     self.frame_duration = 0.32
-  elseif kind == Tile.GREEN_EXP then
+  elseif kind == Tile.GREEN_EXP or kind == Tile.RED_EXP then
     self.frames = 4
     self.frame_duration = 0.16
     self.exploding = true
@@ -100,6 +103,20 @@ Tile.texture_name = function(self)
     end
   elseif self.kind == Tile.GREEN_EXP then
     return 'tile-green-exp-${f}' % { f = self.frame }
+  elseif self.kind == Tile.RED then
+    return 'tile-red-1'
+  elseif self.kind == Tile.RED_FLASHING then
+    if self.frame == 0 then
+      return 'tile-red-0'
+    elseif self.frame == 1 then
+      return 'tile-red-1'
+    elseif self.frame == 2 then
+      return 'tile-red-2'
+    elseif self.frame == 3 then
+      return 'tile-red-1'
+    end
+  elseif self.kind == Tile.RED_EXP then
+    return 'tile-red-exp-${f}' % { f = self.frame }
   elseif self.kind == Tile.ZONE_PINK then
     return 'tile-zone-pink-${f}' % { f = self.frame }
   elseif self.kind == Tile.ZONE_PINK_EXP then
@@ -148,18 +165,26 @@ Tile.embeds_to = function(self)
     return Tile.GREEN
   elseif self.kind == Tile.GREEN_FLASHING then
     return Tile.GREEN
+  elseif self.kind == Tile.RED then
+    return Tile.RED
+  elseif self.kind == Tile.RED_FLASHING then
+    return Tile.RED
   end
 end
 
 Tile.explodes_to = function(self)
   if self.kind == Tile.GREEN then
     return Tile.GREEN_EXP
+  elseif self.kind == Tile.RED then
+    return Tile.RED_EXP
   end
 end
 
 Tile.controls_to = function(self)
   if self.kind == Tile.GREEN then
     return Tile.GREEN_FLASHING
+  elseif self.kind == Tile.RED then
+    return Tile.RED_FLASHING
   end
 end
 
