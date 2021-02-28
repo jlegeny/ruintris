@@ -53,8 +53,8 @@ function love.load()
   renderer:resize(RENDER_WIDTH, RENDER_HEIGHT)
   overlay:resize(RENDER_WIDTH, RENDER_HEIGHT)
 
-  --game.protagonist:set_position(10, 22, 0, 0)
-  game.protagonist:set_position(14, 13, 0, 0)
+  game.protagonist:set_position(4, 22, 0, 0)
+  --game.protagonist:set_position(14, 13, 0, 0)
 end
 
 function love.keypressed(key, unicode)
