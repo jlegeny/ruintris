@@ -14,7 +14,7 @@ local grid01 = require 'grids/grid01'
 
 -- CONSTANTS
 
-util.debug = true
+util.debug = false
 
 local WINDOW_WIDTH = 960
 local WINDOW_HEIGHT = 720
@@ -55,6 +55,7 @@ function love.load()
 
   game.protagonist:set_position(4, 22, 0, 0)
   --game.protagonist:set_position(14, 13, 0, 0)
+  game.text = 'Press [escape] any time to restart the level. Press [q] to quit.'
 end
 
 function love.keypressed(key, unicode)
@@ -75,6 +76,12 @@ function love.keypressed(key, unicode)
       local piece = Piece(Piece.L_RIGHT, Piece.GREEN)
       piece:set_position(5, 19)
       table.insert(game.pieces, piece)
+    end
+  else
+    if key == 'escape' then
+      love.load()
+    elseif key == 'q' then
+      love.event.quit()
     end
   end
 
