@@ -27,7 +27,7 @@ Game.LEFT = 'left'
 Game.RIGHT = 'right'
 Game.STOP = 'stop'
 
-Game.new = function(level, protagonist)
+Game.new = function(level)
   local self = {}
   setmetatable(self, Game)
 
@@ -36,7 +36,7 @@ Game.new = function(level, protagonist)
   self.grid = level.grid
   self.zones = level.zones
   self.script = level.script
-  self.protagonist = protagonist
+  self.protagonist = Protagonist()
   self.falling_piece = nil
   self.pieces = {}
   self.input_gating = 0

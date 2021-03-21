@@ -18,7 +18,18 @@ Grid.new = function(width, height, matrix)
   self.height = height
   self.matrix = matrix
 
+  self.place_to_marker = {}
+  self.marker_to_place = {}
+
   return self
+end
+
+Grid.add_marker = function(self, r, c, m)
+  if not self.place_to_marker[r] then
+    self.place_to_marker[r] = {}
+  end
+  self.place_to_marker[r][c] = m
+  self.marker_to_place[m] = {r, c}
 end
 
 Grid.passable = function(self, x, y)

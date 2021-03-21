@@ -1,3 +1,4 @@
+local util = require 'util'
 local palette = require 'palette'
 
 local Grid = require 'grid'
@@ -48,5 +49,14 @@ gu.set_color = function(color, intensity)
   end
 end
 
+gu.panic = function(template, ...)
+  local args = {...}
+  for i, v in ipairs(args) do
+    template = template:gsub('{}', util.str(v), 1)
+  end
+
+  io.stderr:write(template .. '\n')
+  love.event.quit(1)
+end
 
 return gu

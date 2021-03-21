@@ -1,20 +1,21 @@
 local util = require 'util'
 
 local Game = require 'game'
+local Menu = require 'menu'
 local Catalog = require 'catalog'
 
-local Protagonist = require 'protagonist'
 local Piece = require 'piece'
 
 local Background = require 'background'
 local Renderer = require 'renderer'
 local Overlay = require 'overlay'
+local Hallway = require 'hallway'
 
-local grid01 = require 'grids/grid01'
+local level01 = require 'levels/level01'
 
 -- CONSTANTS
 
-util.debug = false
+util.debug = true
 
 local WINDOW_WIDTH = 960
 local WINDOW_HEIGHT = 720
@@ -27,13 +28,20 @@ local background_sprites = Catalog(Catalog.backgrounds)
 local tile_sprites = Catalog(Catalog.tiles)
 local sprites = Catalog(Catalog.sprites)
 
-local protagonist = Protagonist()
-local game = Game(grid01, protagonist)
+local menu = Menu({level01})
+local hallway = Hallway(sprites)
+
+local game = Game(level01)
 local background = Background(background_sprites)
 local renderer = Renderer(tile_sprites, sprites)
 local overlay = Overlay(sprites)
 
 -- LOVE ROUTINES
+
+local State = {
+  MENU = 'menu',
+  IN_GAME = 'in-game',
+}
 
 function love.load()
   love.window.setTitle("Ruintris")
@@ -49,6 +57,8 @@ function love.load()
   ' abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?-+/():;%&`_*#=[]\'{}', 1) 
   love.graphics.setFont(font)
 
+  background:set('bg-menu')
+  hallway:resize(RENDER_WIDTH, RENDER_HEIGHT)
   background:resize(RENDER_WIDTH, RENDER_HEIGHT)
   renderer:resize(RENDER_WIDTH, RENDER_HEIGHT)
   overlay:resize(RENDER_WIDTH, RENDER_HEIGHT)
@@ -85,16 +95,26 @@ function love.keypressed(key, unicode)
     end
   end
 
-  game:keypressed(key, unicode)
+  if state == State.MENU then
+    menu:keypressed(key, unicode)
+  elseif state == State.IN_GAME then
+    game:keypressed(key, unicode)
+  end
 end
 
 function love.draw()
   local dt = love.timer.getDelta()
 
-  game:update(dt)
+  if state == State.Menu then
+    menu:update(dt)
 
-  background:draw(game, dt)
-  renderer:draw(game, dt)
-  overlay:draw(game, dt)
-  --
+    background:draw(game, dt)
+    hallway:draw(menu, dt)
+  elseif state == State.IN_GAME then
+    game:update(dt)
+
+    background:draw(game, dt)
+    renderer:draw(game, dt)
+    overlay:draw(game, dt)
+  end
 end
