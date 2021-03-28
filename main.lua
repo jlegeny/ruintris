@@ -43,6 +43,8 @@ local State = {
   IN_GAME = 'in-game',
 }
 
+local state = State.MENU
+
 function love.load()
   love.window.setTitle("Ruintris")
   love.window.setMode(WINDOW_WIDTH, WINDOW_HEIGHT, 
@@ -54,7 +56,7 @@ function love.load()
     minheight = WINDOW_HEIGHT
   })
   local font = love.graphics.newImageFont('assets/font.png',
-  ' abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?-+/():;%&`_*#=[]\'{}', 1) 
+  ' abcdefghijklmnopqrstuvwxyz0123456', -1) 
   love.graphics.setFont(font)
 
   background:set('bg-menu')
@@ -66,9 +68,15 @@ function love.load()
   game.protagonist:set_position(4, 22, 0, 0)
   --game.protagonist:set_position(14, 13, 0, 0)
   game.text = 'Press [escape] any time to restart the level. Press [q] to quit.'
+
+  -- dev hacks
+  menu.selected = 1
+  menu:activate('level-select')
+
 end
 
 function love.keypressed(key, unicode)
+  key = love.keyboard.getScancodeFromKey(key)
   if util.debug then
     if key == 'r' then
       love.event.quit('restart')
@@ -87,12 +95,10 @@ function love.keypressed(key, unicode)
       piece:set_position(5, 19)
       table.insert(game.pieces, piece)
     end
-  else
-    if key == 'escape' then
-      love.load()
-    elseif key == 'q' then
-      love.event.quit()
-    end
+  end
+
+  if key == 'q' then
+    love.event.quit()
   end
 
   if state == State.MENU then
@@ -105,11 +111,13 @@ end
 function love.draw()
   local dt = love.timer.getDelta()
 
-  if state == State.Menu then
-    menu:update(dt)
+  if state == State.MENU then
+    for _, entity in ipairs({menu, background, hallway}) do
+      entity:update(dt)
+    end
 
-    background:draw(game, dt)
-    hallway:draw(menu, dt)
+    background:draw(game)
+    hallway:draw(menu)
   elseif state == State.IN_GAME then
     game:update(dt)
 

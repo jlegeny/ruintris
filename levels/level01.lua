@@ -183,5 +183,6 @@ function build()
 end
 
 return {
-  build = build
+  name = 'approach',
+  build = build,
 }

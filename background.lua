@@ -40,7 +40,10 @@ Background.pre_render = function(self)
   love.graphics.setCanvas()
 end
 
-Background.draw = function(self, game, dt)
+Background.update = function(self, dt)
+end
+
+Background.draw = function(self, game)
   local draw_width, draw_height = love.graphics.getDimensions()
   local mw = draw_width / self.width
   local mh = draw_height / self.height

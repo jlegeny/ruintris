@@ -1,3 +1,4 @@
+local gu = require 'gameutil'
 local util = require 'util'
 local Scroll = require 'scroll'
 
@@ -10,13 +11,15 @@ setmetatable(Hallway, {
   end,
 })
 
+local ITEM_HEIGHT = 20
+
 Hallway.new = function(sprites)
   local self = {}
   setmetatable(self, Hallway)
 
   self.sprites = sprites
 
-  self.scroll = Scroll(sprites, 'horizontal', 240, 180, 200, 200)
+  self.scroll = Scroll(sprites, 'vertical', 240, 180, 200, 200)
 
   return self
 end
@@ -40,12 +43,29 @@ Hallway.pre_render = function(self)
   love.graphics.setCanvas()
 end
 
-Hallway.draw = function(self, menu, dt)
+Hallway.update = function(self, dt)
+  self.scroll:update(dt)
+end
+
+Hallway.draw = function(self, menu)
+  love.graphics.setCanvas(self.dynamic_canvas)
+  love.graphics.clear()
+
+  gu.set_color('eggplant', 0)
+  love.graphics.rectangle('line', 140.5, 150.5 + menu.selected * ITEM_HEIGHT, 200, ITEM_HEIGHT)
+
+  
+  gu.set_color()
+
+  for i, option in ipairs(menu.options) do
+    love.graphics.printf(option.title, 0, 150 + (i - 1) * ITEM_HEIGHT, 480, 'center')
+  end
+
   local draw_width, draw_height = love.graphics.getDimensions()
   local mw = draw_width / self.width
   local mh = draw_height / self.height
-  love.graphics.setCanvas()
   self.scroll:draw(menu, dt)
+  love.graphics.setCanvas()
   love.graphics.draw(self.static_canvas, 0, 0, 0, mw, mh)
   love.graphics.draw(self.dynamic_canvas, 0, 0, 0, mw, mh)
 end

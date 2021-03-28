@@ -59,4 +59,15 @@ gu.panic = function(template, ...)
   love.event.quit(1)
 end
 
+local random_values = {}
+local next_random = 0
+gu.drandom = function()
+  next_random = (next_random + 1) % #random_values
+  return random_values[next_random + 1]
+end
+
+for i = 0, 255 do
+  table.insert(random_values, math.random())
+end
+
 return gu

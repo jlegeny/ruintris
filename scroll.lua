@@ -29,15 +29,19 @@ Scroll.new = function(sprites, orientation, x, y, width, height)
   if orientation == 'horizontal' then
     self.w = width
     self.h = height
+    self.cw = 0
+    self.ch = height
+    self.animates = true
   elseif orientation == 'vertical' then
     self.w = height
     self.h = width
+    self.cw = 0
+    self.ch = width
+    self.animates = true
   else
     gu.panic('Unknown scroll orientation "{}"', orientation)
   end
 
-  self.cw = self.w
-  self.ch = self.h
 
   return self
 end
@@ -90,7 +94,6 @@ Scroll.pre_render = function(self)
 
   if self.ch % TILE_H ~= 0 then
     local lh = self.ch % TILE_H
-    print(lh)
     love.graphics.setScissor(ox - LEFT, oy + i * TILE_H , LEFT + self.cw + RIGHT, lh)
     love.graphics.draw(left_tile, ox - LEFT, oy + i * TILE_H)
     love.graphics.draw(right_tile, ox + self.cw, oy + i * TILE_H)
@@ -104,9 +107,19 @@ Scroll.pre_render = function(self)
   love.graphics.setCanvas()
 end
 
-ro = 0 
-Scroll.draw = function(self, menu, dt)
-  ro = ro + dt
+Scroll.update = function(self, dt)
+  if self.cw < self.w then
+    self.cw = math.ceil(self.cw + 400 * dt)
+    if self.cw > self.w then
+      self.cw = self.w
+    end
+    self:pre_render()
+  else
+    self.animates = false
+  end
+end
+
+Scroll.draw = function(self, menu)
   local draw_width, draw_height = love.graphics.getDimensions()
   local mw = draw_width / self.width
   local mh = draw_height / self.height
